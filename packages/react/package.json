@@ -1,0 +1,44 @@
+{
+  "name": "@sehv-oss/i18n-react",
+  "version": "0.0.0",
+  "description": "React bindings for @sehv-oss/i18n",
+  "type": "module",
+  "scripts": {
+    "build": "tsdown",
+    "eslint:check": "eslint ."
+  },
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js"
+    }
+  },
+  "keywords": [
+    "i18n",
+    "react",
+    "internationalization",
+    "localization"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sehv-oss/i18n.git",
+    "directory": "packages/react"
+  },
+  "engines": {
+    "node": ">=22 <25"
+  },
+  "peerDependencies": {
+    "@sehv-oss/i18n": "workspace:*",
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "tsdown": "0.20.1",
+    "typescript": "5.9.3"
+  }
+}

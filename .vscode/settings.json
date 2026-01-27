@@ -1,0 +1,14 @@
+{
+  "typescript.tsdk": "node_modules/typescript/lib",
+
+  "eslint.options": {
+    "overrideConfigFile": ".eslint.config.js"
+  },
+  "eslint.workingDirectories": ["./packages/core", "./packages/react"],
+  "eslint.validate": ["javascript", "typescript", "typescriptreact"],
+
+  "prettier.configPath": ".prettier.config.js",
+
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true
+}

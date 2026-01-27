@@ -1,0 +1,41 @@
+{
+  "name": "@sehv-oss/i18n",
+  "version": "0.1.0",
+  "description": "Modern i18n library for JavaScript. Web standards based, runs everywhere.",
+  "type": "module",
+  "scripts": {
+    "build": "tsdown"
+  },
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/i18n.d.ts",
+      "import": "./dist/i18n.js"
+    }
+  },
+  "keywords": [
+    "i18n",
+    "l10n",
+    "internationalization",
+    "localization",
+    "intl",
+    "message format",
+    "translation"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sehv-oss/i18n.git",
+    "directory": "packages/core"
+  },
+  "engines": {
+    "node": ">=22 <25"
+  },
+  "devDependencies": {
+    "tsdown": "0.20.1",
+    "typescript": "5.9.3"
+  }
+}
