@@ -1,7 +1,7 @@
 import type { MessageDictionary } from '../types.ts';
-import type { MessageLoader } from './loader.interface.ts';
+import type { ILoader } from './loader.interface.ts';
 
-export class JsonLoader implements MessageLoader {
+export class JsonLoader implements ILoader {
   readonly extensions = ['.json'];
 
   parse(content: string): MessageDictionary {
@@ -9,7 +9,7 @@ export class JsonLoader implements MessageLoader {
       const parsed = JSON.parse(content) as unknown;
 
       if (!this.isValidDictionary(parsed)) {
-        throw new Error('Invalid message dictionary format');
+        throw new Error('Invalid message dictionary format!');
       }
 
       return parsed;
@@ -35,5 +35,3 @@ export class JsonLoader implements MessageLoader {
     return true;
   }
 }
-
-export type { MessageLoader } from './loader.interface.js';

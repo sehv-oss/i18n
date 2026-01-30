@@ -1,6 +1,6 @@
-import type { MessageDictionary } from '../types.ts';
+import type { Messages } from '../messages/messages.ts';
 
-export interface MessageLoader {
+export interface ILoader {
   extensions: string[];
-  parse(content: string): MessageDictionary;
+  parse(content: string): Messages;
 }
