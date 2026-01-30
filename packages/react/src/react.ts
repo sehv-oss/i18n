@@ -1,4 +1,4 @@
-export { I18nProvider, type I18nProviderProps } from './provider.ts';
+export { I18nProvider, type I18nProviderProps } from './provider.tsx';
 export { I18nContext, type I18nContextValue } from './context.ts';
 export {
   useI18n,
@@ -23,4 +23,4 @@ export {
   type FormatDateProps,
   type FormatListProps,
   type FormatRelativeTimeProps,
-} from './components.ts';
+} from './components.tsx';

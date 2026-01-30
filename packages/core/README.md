@@ -16,51 +16,48 @@ pnpm add @sehv-oss/i18n
 import { createI18n } from '@sehv-oss/i18n';
 
 const i18n = createI18n({
-  locale: 'pt-BR',
+  locale: 'en',
   fallbackLocale: 'en',
   messages: {
-    'pt-BR': {
-      greeting: 'Olá, {$name}!',
-      items: `.match {$count :number}
-one {{Você tem {$count} item}}
-*   {{Você tem {$count} itens}}`,
-    },
     en: {
       greeting: 'Hello, {$name}!',
+      items: `.match {$count :number}
+one {{You have {$count} item}}
+*   {{You have {$count} items}}`,
     },
   },
 });
 
-i18n.translate('greeting', { name: 'Maria' });
-// → "Olá, Maria!"
+i18n.translate('greeting', { name: 'World' });
+// → "Hello, World!"
 
 i18n.translate('items', { count: 5 });
-// → "Você tem 5 itens"
+// → "You have 5 items"
 ```
 
 ### Formatters
 
 ```typescript
 i18n.formatNumber(1234.56);
-// → "1.234,56"
+// → "1,234.56"
 
-i18n.formatCurrency(99.9, 'BRL');
-// → "R$ 99,90"
+i18n.formatCurrency(99.9, 'USD');
+// → "$99.90"
 
 i18n.formatDate(new Date(), { dateStyle: 'long' });
-// → "27 de janeiro de 2026"
+// → "January 27, 2026"
 
-i18n.formatList(['maçã', 'banana', 'laranja']);
-// → "maçã, banana e laranja"
+i18n.formatList(['apple', 'banana', 'orange']);
+// → "apple, banana, and orange"
 
 i18n.formatRelativeTime(-2, 'days');
-// → "há 2 dias"
+// → "2 days ago"
 ```
 
 ### Lazy Loading
 
 ```typescript
-await i18n.loadMessagesAsync('/locales/pt-BR.json');
+await i18n.loadMessagesAsync('/locales/en.json');
 ```
 
 ### Custom Loader
@@ -78,11 +75,11 @@ const yamlLoader: MessageLoader = {
 };
 
 const i18n = createI18n({
-  locale: 'pt-BR',
+  locale: 'en',
   loaders: [yamlLoader],
 });
 
-await i18n.loadMessagesAsync('/locales/pt-BR.yaml');
+await i18n.loadMessagesAsync('/locales/en.yaml');
 ```
 
 ## API

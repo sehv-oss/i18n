@@ -36,14 +36,14 @@ one {{You have {$count} item}}
       expect(parser.parse(message, { count: 5 })).toBe('You have 5 items');
     });
 
-    it('should select correct plural form for Portuguese', () => {
-      const parser = new MF2Parser('pt-BR');
+    it('should select correct plural form for other locales', () => {
+      const parser = new MF2Parser('de');
       const message = `.match {$count :number}
-one {{Você tem {$count} item}}
-*   {{Você tem {$count} itens}}`;
+one {{You have {$count} item}}
+*   {{You have {$count} items}}`;
 
-      expect(parser.parse(message, { count: 1 })).toBe('Você tem 1 item');
-      expect(parser.parse(message, { count: 5 })).toBe('Você tem 5 itens');
+      expect(parser.parse(message, { count: 1 })).toBe('You have 1 item');
+      expect(parser.parse(message, { count: 5 })).toBe('You have 5 items');
     });
   });
 

@@ -17,10 +17,10 @@ import { createI18n } from '@sehv-oss/i18n';
 import { I18nProvider } from '@sehv-oss/i18n-react';
 
 const i18n = createI18n({
-  locale: 'pt-BR',
+  locale: 'en',
   messages: {
-    'pt-BR': {
-      greeting: 'Olá, {$name}!',
+    en: {
+      greeting: 'Hello, {$name}!',
     },
   },
 });
@@ -54,7 +54,7 @@ function MyComponent() {
 
   return (
     <div>
-      <p>{translate('greeting', { name: 'Maria' })}</p>
+      <p>{translate('greeting', { name: 'World' })}</p>
       <p>{formatNumber(1234.56)}</p>
       <p>{formatCurrency(99.9, 'BRL')}</p>
       <p>{formatDate(new Date(), { dateStyle: 'long' })}</p>
@@ -79,7 +79,7 @@ import {
 function MyComponent() {
   return (
     <div>
-      <Trans id="greeting" values={{ name: 'Maria' }} />
+      <Trans id="greeting" values={{ name: 'World' }} />
       <FormatNumber value={1234.56} />
       <FormatCurrency value={99.9} currency="BRL" />
       <FormatDate value={new Date()} dateStyle="long" />

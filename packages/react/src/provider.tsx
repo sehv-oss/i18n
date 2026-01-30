@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, type ReactNode } from 'react';
+import { useState, useMemo, type ReactNode } from 'react';
 import type { I18n } from '@sehv-oss/i18n';
 import { I18nContext, type I18nContextValue } from './context.ts';
 

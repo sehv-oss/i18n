@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "tsdown",
-    "eslint:check": "eslint ."
+    "lint:eslint": "eslint ."
   },
   "files": [
     "dist"
