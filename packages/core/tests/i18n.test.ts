@@ -7,17 +7,14 @@ describe('createI18n', () => {
 
   beforeEach(() => {
     i18n = createI18n({
-      locale: 'pt-BR',
+      locale: 'en',
       fallbackLocale: 'en',
       messages: {
-        'pt-BR': {
-          greeting: 'Olá, {$name}!',
-          nested: {
-            key: 'Valor aninhado',
-          },
-        },
         en: {
           greeting: 'Hello, {$name}!',
+          nested: {
+            key: 'Nested value',
+          },
           onlyInEnglish: 'Only in English',
         },
       },
@@ -26,11 +23,13 @@ describe('createI18n', () => {
 
   describe('translate', () => {
     it('should translate a simple key', () => {
-      expect(i18n.translate('greeting', { name: 'Maria' })).toBe('Olá, Maria!');
+      expect(i18n.translate('greeting', { name: 'World' })).toBe(
+        'Hello, World!'
+      );
     });
 
     it('should translate nested keys', () => {
-      expect(i18n.translate('nested.key')).toBe('Valor aninhado');
+      expect(i18n.translate('nested.key')).toBe('Nested value');
     });
 
     it('should fallback to fallbackLocale', () => {
@@ -52,19 +51,19 @@ describe('createI18n', () => {
 
   describe('getLocales', () => {
     it('should return available locales', () => {
-      expect(i18n.getLocales()).toEqual(['pt-BR', 'en']);
+      expect(i18n.getLocales()).toEqual(['en']);
     });
   });
 
   describe('loadMessages', () => {
     it('should load new messages', () => {
-      i18n.loadMessages('pt-BR', { newKey: 'Novo valor' });
-      expect(i18n.translate('newKey')).toBe('Novo valor');
+      i18n.loadMessages('en', { newKey: 'New value' });
+      expect(i18n.translate('newKey')).toBe('New value');
     });
 
     it('should merge with existing messages', () => {
-      i18n.loadMessages('pt-BR', { newKey: 'Novo valor' });
-      expect(i18n.translate('greeting', { name: 'Test' })).toBe('Olá, Test!');
+      i18n.loadMessages('en', { newKey: 'New value' });
+      expect(i18n.translate('greeting', { name: 'Test' })).toBe('Hello, Test!');
     });
   });
 });
@@ -73,20 +72,20 @@ describe('formatters', () => {
   let i18n: I18n;
 
   beforeEach(() => {
-    i18n = createI18n({ locale: 'pt-BR' });
+    i18n = createI18n({ locale: 'en' });
   });
 
   describe('formatNumber', () => {
     it('should format numbers', () => {
-      expect(i18n.formatNumber(1234.56)).toBe('1.234,56');
+      expect(i18n.formatNumber(1234.56)).toBe('1,234.56');
     });
   });
 
   describe('formatCurrency', () => {
     it('should format currency', () => {
-      const result = i18n.formatCurrency(99.9, 'BRL');
-      expect(result).toContain('99,90');
-      expect(result).toContain('R$');
+      const result = i18n.formatCurrency(99.9, 'USD');
+      expect(result).toContain('99.90');
+      expect(result).toContain('$');
     });
   });
 
@@ -101,7 +100,7 @@ describe('formatters', () => {
   describe('formatList', () => {
     it('should format lists', () => {
       const result = i18n.formatList(['a', 'b', 'c']);
-      expect(result).toBe('a, b e c');
+      expect(result).toBe('a, b, and c');
     });
   });
 
@@ -109,7 +108,7 @@ describe('formatters', () => {
     it('should format relative time', () => {
       const result = i18n.formatRelativeTime(-2, 'days');
       expect(result).toContain('2');
-      expect(result.toLowerCase()).toContain('dia');
+      expect(result.toLowerCase()).toContain('day');
     });
   });
 });

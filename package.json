@@ -7,11 +7,12 @@
     "build": "pnpm -r build",
     "test": "vitest",
     "test:coverage": "vitest --coverage",
-    "eslint:check": "pnpm -r eslint:check",
-    "prettier:loader": "prettier --config .prettier.config.js",
-    "prettier:check": "pnpm prettier:loader --check .",
-    "prettier:write": "pnpm prettier:loader --write .",
-    "clean": "git clean -fdX"
+    "clean": "git clean -fdX",
+    "lint": "pnpm lint:cspell && pnpm lint:prettier",
+    "lint:cspell": "cspell . --config .cspell.config.js",
+    "lint:eslint": "pnpm -r lint:eslint",
+    "lint:prettier": "prettier --config .prettier.config.js --check .",
+    "cspell": "cspell"
   },
   "devDependencies": {
     "@types/node": "24.10.9",
