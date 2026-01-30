@@ -37,7 +37,7 @@ export class MF2Parser implements IParser {
 
   private parseMatch(message: string, values: Record<string, unknown>): string {
     const parsed = this.parseMatchSyntax(message);
-    if (!parsed.selectors || !parsed.variants) {
+    if (!parsed.selectors?.length || !parsed.variants?.length) {
       return message;
     }
 

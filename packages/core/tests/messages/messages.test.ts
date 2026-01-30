@@ -1,70 +1,68 @@
-import { describe, it, expect } from 'vitest';
+import { expect, test } from 'vitest';
 import { MessagesManager } from '../../src/messages/messages.ts';
 
-describe('MessagesManager', () => {
-  it('should store and retrieve messages by locale', () => {
-    const manager = new MessagesManager();
+test('should store and retrieve messages by locale', () => {
+  const manager = new MessagesManager();
 
-    manager.set('en', { greeting: 'Hello' });
-    const messages = manager.get('en');
+  manager.set('en', { greeting: 'Hello' });
+  const messages = manager.get('en');
 
-    expect(messages).toEqual({ greeting: 'Hello' });
-  });
+  expect(messages).toEqual({ greeting: 'Hello' });
+});
 
-  it('should return undefined for non-existent locale', () => {
-    const manager = new MessagesManager();
+test('should return undefined for non-existent locale', () => {
+  const manager = new MessagesManager();
 
-    const messages = manager.get('en');
+  const messages = manager.get('en');
 
-    expect(messages).toBeUndefined();
-  });
+  expect(messages).toBeUndefined();
+});
 
-  it('should check if locale exists', () => {
-    const manager = new MessagesManager();
+test('should check if locale exists', () => {
+  const manager = new MessagesManager();
 
-    manager.set('en', { greeting: 'Hello' });
-    const hasEn = manager.has('en');
-    const hasFr = manager.has('fr');
+  manager.set('en', { greeting: 'Hello' });
+  const hasEn = manager.has('en');
+  const hasFr = manager.has('fr');
 
-    expect(hasEn).toBe(true);
-    expect(hasFr).toBe(false);
-  });
+  expect(hasEn).toBe(true);
+  expect(hasFr).toBe(false);
+});
 
-  it('should return all available locales', () => {
-    const manager = new MessagesManager();
+test('should return all available locales', () => {
+  const manager = new MessagesManager();
 
-    manager.set('en', { greeting: 'Hello' });
-    manager.set('fr', { greeting: 'Bonjour' });
-    const locales = manager.getLocales();
+  manager.set('en', { greeting: 'Hello' });
+  manager.set('fr', { greeting: 'Bonjour' });
+  const locales = manager.getLocales();
 
-    expect(locales).toEqual(['en', 'fr']);
-  });
+  expect(locales).toEqual(['en', 'fr']);
+});
 
-  it('should get a specific message by key', () => {
-    const manager = new MessagesManager();
+test('should get a specific message by key', () => {
+  const manager = new MessagesManager();
 
-    manager.set('en', { greeting: 'Hello', farewell: 'Goodbye' });
-    const greeting = manager.getMessage('en', 'greeting');
-    const farewell = manager.getMessage('en', 'farewell');
+  manager.set('en', { greeting: 'Hello', farewell: 'Goodbye' });
+  const greeting = manager.getMessage('en', 'greeting');
+  const farewell = manager.getMessage('en', 'farewell');
 
-    expect(greeting).toBe('Hello');
-    expect(farewell).toBe('Goodbye');
-  });
+  expect(greeting).toBe('Hello');
+  expect(farewell).toBe('Goodbye');
+});
 
-  it('should return undefined for non-existent message key', () => {
-    const manager = new MessagesManager();
+test('should return undefined for non-existent message key', () => {
+  const manager = new MessagesManager();
 
-    manager.set('en', { greeting: 'Hello' });
-    const nonexistent = manager.getMessage('en', 'nonexistent');
+  manager.set('en', { greeting: 'Hello' });
+  const nonexistent = manager.getMessage('en', 'nonexistent');
 
-    expect(nonexistent).toBeUndefined();
-  });
+  expect(nonexistent).toBeUndefined();
+});
 
-  it('should return undefined for non-existent locale when getting message', () => {
-    const manager = new MessagesManager();
+test('should return undefined for non-existent locale when getting message', () => {
+  const manager = new MessagesManager();
 
-    const nonexistent = manager.getMessage('en', 'greeting');
+  const nonexistent = manager.getMessage('en', 'greeting');
 
-    expect(nonexistent).toBeUndefined();
-  });
+  expect(nonexistent).toBeUndefined();
 });
