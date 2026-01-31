@@ -100,7 +100,6 @@ Creates an i18n instance.
 | `formatRelativeTime(value, unit, options?)` | Format relative time        |
 | `loadMessages(locale, messages)`            | Load messages synchronously |
 | `loadMessagesAsync(url)`                    | Load messages via fetch     |
-| `registerLoader(loader)`                    | Register a custom loader    |
 | `setLocale(locale)`                         | Change current locale       |
 | `getLocales()`                              | Get available locales       |
 

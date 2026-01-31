@@ -8,7 +8,7 @@ Modern i18n library for JavaScript. Web standards based, runs everywhere.
 - **MessageFormat 2.0** — Modern message syntax
 - **Universal** — Works in browsers, Node.js, Bun, Deno
 - **Type-safe** — Full TypeScript support
-- **Extensible** — Custom loaders and parsers via plugins
+- **Extensible** — Custom loaders via plugins
 - **Lightweight** — Zero dependencies, tree-shakeable
 
 ## Packages

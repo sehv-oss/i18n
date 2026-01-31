@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
 import type {
   FormatNumberOptions,
-  FormatCurrencyOptions,
   FormatDateOptions,
   FormatListOptions,
   FormatRelativeTimeOptions,

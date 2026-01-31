@@ -1,133 +1,142 @@
-import { MessageStore } from './message-store.ts';
-import { MessageCache } from './cache.ts';
-import { MF2Parser } from './parsers/mf2-parser.ts';
+import { MessageCache } from './caches/message.ts';
+import {
+  FormatCurrency,
+  type FormatCurrencyOptions,
+} from './formatters/currency.ts';
+import { FormatDate, type FormatDateOptions } from './formatters/date.ts';
+import { FormatList, type FormatListOptions } from './formatters/list.ts';
+import { FormatNumber, type FormatNumberOptions } from './formatters/number.ts';
+import {
+  FormatRelativeTime,
+  type FormatRelativeTimeOptions,
+  type FormatRelativeTimeUnit,
+} from './formatters/relative-time.ts';
 import { JsonLoader } from './loaders/json-loader.ts';
-import { formatNumber as formatNumberFn } from './formatters/number.ts';
-import { formatCurrency as formatCurrencyFn } from './formatters/currency.ts';
-import { formatDate as formatDateFn } from './formatters/date.ts';
-import { formatList as formatListFn } from './formatters/list.ts';
-import { formatRelativeTime as formatRelativeTimeFn } from './formatters/relative-time.ts';
-import type {
-  I18n,
-  I18nConfig,
-  MessageDictionary,
-  MessageLoader,
-  FormatNumberOptions,
-  FormatCurrencyOptions,
-  FormatDateOptions,
-  FormatListOptions,
-  FormatRelativeTimeOptions,
-  RelativeTimeUnit,
-} from './types.ts';
+import type { ILoader } from './loaders/loader.interface.ts';
+import { type Messages, MessagesManager } from './messages/messages.ts';
+import { MF2Parser } from './parsers/mf2-parser.ts';
 
-export class I18nInstance implements I18n {
-  private _locale: string;
-  private _fallbackLocale: string | undefined;
-  private store: MessageStore;
+export type I18nConfig = {
+  locale: string;
+  fallbackLocale?: string;
+  messages?: Record<string, Messages>;
+  loaders?: ILoader[];
+};
+
+export class I18nInstance {
+  private locale: string;
+  private fallbackLocale: string | undefined;
+  private messagesManager: MessagesManager;
   private messageCache: MessageCache;
-  private loaders: MessageLoader[];
-  private parsers: Map<string, MF2Parser>;
+  private loaders: ILoader[];
+  private mf2ParserByLocale: Map<string, MF2Parser>;
 
   constructor(config: I18nConfig) {
-    this._locale = config.locale;
-    this._fallbackLocale = config.fallbackLocale;
-    this.store = new MessageStore();
-    this.messageCache = new MessageCache();
-    this.loaders = [new JsonLoader(), ...(config.loaders ?? [])];
-    this.parsers = new Map();
+    const { locale, fallbackLocale, loaders, messages } = config;
 
-    if (config.messages) {
-      for (const [locale, messages] of Object.entries(config.messages)) {
-        this.store.set(locale, messages);
-      }
+    this.locale = locale;
+    this.fallbackLocale = fallbackLocale;
+    this.messagesManager = new MessagesManager();
+    this.messageCache = new MessageCache();
+    this.mf2ParserByLocale = new Map();
+    this.loaders = [new JsonLoader(), ...(loaders ?? [])];
+
+    if (messages) {
+      Object.entries(messages).forEach(([locale, messagesLocale]) => {
+        this.messagesManager.set(locale, messagesLocale);
+      });
     }
   }
 
-  get locale(): string {
-    return this._locale;
+  public getLocale(): string {
+    return this.locale;
   }
 
-  get fallbackLocale(): string | undefined {
-    return this._fallbackLocale;
-  }
-
-  setLocale(locale: string): void {
-    this._locale = locale;
+  public setLocale(locale: string): void {
+    this.locale = locale;
     this.messageCache.clear();
   }
 
-  getLocales(): string[] {
-    return this.store.getLocales();
+  public getFallbackLocale(): string | undefined {
+    return this.fallbackLocale;
   }
 
-  translate(key: string, values?: Record<string, unknown>): string {
-    const cacheKey = `${this._locale}:${key}:${JSON.stringify(values ?? {})}`;
+  public getLocales(): string[] {
+    return this.messagesManager.getLocales();
+  }
+
+  public translate(key: string, values?: Record<string, unknown>): string {
+    const cacheKey = `${this.locale}:${key}:${JSON.stringify(values ?? {})}`;
 
     if (this.messageCache.has(cacheKey)) {
       return this.messageCache.get(cacheKey)!;
     }
 
-    let message = this.store.getMessage(this._locale, key);
-
-    if (!message && this._fallbackLocale) {
-      message = this.store.getMessage(this._fallbackLocale, key);
+    let message = this.messagesManager.getMessage(this.locale, key);
+    if (!message && this.fallbackLocale) {
+      message = this.messagesManager.getMessage(this.fallbackLocale, key);
     }
 
     if (!message) {
       return key;
     }
 
-    const parser = this.getParser(this._locale);
+    const parser = this.getParser(this.locale);
     const result = parser.parse(message, values);
 
     this.messageCache.set(cacheKey, result);
     return result;
   }
 
-  formatNumber(value: number, options?: FormatNumberOptions): string {
-    const locale = options?.locale ?? this._locale;
-    return formatNumberFn(value, locale, options);
+  public formatNumber(value: number, options?: FormatNumberOptions): string {
+    const locale = options?.locale ?? this.locale;
+
+    return FormatNumber.format(value, locale, options);
   }
 
-  formatCurrency(
+  public formatCurrency(
     value: number,
     currency: string,
     options?: FormatCurrencyOptions
   ): string {
-    const locale = options?.locale ?? this._locale;
-    return formatCurrencyFn(value, currency, locale, options);
+    const locale = options?.locale ?? this.locale;
+
+    return FormatCurrency.format(value, currency, locale, options);
   }
 
-  formatDate(value: Date | number, options?: FormatDateOptions): string {
-    const locale = options?.locale ?? this._locale;
-    return formatDateFn(value, locale, options);
+  public formatDate(value: Date | number, options?: FormatDateOptions): string {
+    const locale = options?.locale ?? this.locale;
+
+    return FormatDate.format(value, locale, options);
   }
 
-  formatList(values: string[], options?: FormatListOptions): string {
-    const locale = options?.locale ?? this._locale;
-    return formatListFn(values, locale, options);
+  public formatList(values: string[], options?: FormatListOptions): string {
+    const locale = options?.locale ?? this.locale;
+
+    return FormatList.format(values, locale, options);
   }
 
-  formatRelativeTime(
+  public formatRelativeTime(
     value: number,
-    unit: RelativeTimeUnit,
+    unit: FormatRelativeTimeUnit,
     options?: FormatRelativeTimeOptions
   ): string {
-    const locale = options?.locale ?? this._locale;
-    return formatRelativeTimeFn(value, unit, locale, options);
+    const locale = options?.locale ?? this.locale;
+
+    return FormatRelativeTime.format(value, unit, locale, options);
   }
 
-  loadMessages(locale: string, messages: MessageDictionary): void {
-    this.store.merge(locale, messages);
+  public loadMessages(locale: string, messages: Messages): void {
+    this.messagesManager.set(locale, messages);
     this.messageCache.clear();
   }
 
-  async loadMessagesAsync(url: string): Promise<void> {
+  public async loadMessagesAsync(url: string): Promise<void> {
     const response = await fetch(url);
 
     if (!response.ok) {
       throw new Error(
-        `Failed to load messages from ${url}: ${response.statusText}`
+        `Failed to load messages from ${url}: ${response.statusText}.`
       );
     }
 
@@ -135,70 +144,45 @@ export class I18nInstance implements I18n {
     const loader = this.findLoader(url);
 
     if (!loader) {
-      throw new Error(`No loader found for ${url}`);
+      throw new Error(`No loader found for ${url}.`);
     }
 
     const messages = loader.parse(content);
     const locale = this.extractLocaleFromUrl(url);
 
-    this.store.merge(locale, messages);
-    this.messageCache.clear();
-  }
-
-  registerLoader(loader: MessageLoader): void {
-    this.loaders.push(loader);
+    this.loadMessages(locale, messages);
   }
 
   private getParser(locale: string): MF2Parser {
-    let parser = this.parsers.get(locale);
+    let parser = this.mf2ParserByLocale.get(locale);
     if (!parser) {
       parser = new MF2Parser(locale);
-      this.parsers.set(locale, parser);
+      this.mf2ParserByLocale.set(locale, parser);
     }
+
     return parser;
   }
 
-  private findLoader(url: string): MessageLoader | undefined {
+  private findLoader(url: string): ILoader | undefined {
     const extension = this.getExtension(url);
+
     return this.loaders.find((loader) => loader.extensions.includes(extension));
   }
 
   private getExtension(url: string): string {
     const match = url.match(/\.[^.]+$/);
+
     return match?.[0] ?? '';
   }
 
   private extractLocaleFromUrl(url: string): string {
     const filename = url.split('/').pop() ?? '';
     const match = filename.match(/^([a-z]{2}(?:-[A-Z]{2})?)/);
-    return match?.[1] ?? this._locale;
+
+    return match?.[1] ?? this.locale;
   }
 }
 
-export function createI18n(config: I18nConfig): I18n {
+export function createI18n(config: I18nConfig): I18nInstance {
   return new I18nInstance(config);
 }
-
-export type {
-  I18n,
-  I18nConfig,
-  MessageDictionary,
-  MessageLoader,
-  MessageParser,
-  FormatNumberOptions,
-  FormatCurrencyOptions,
-  FormatDateOptions,
-  FormatListOptions,
-  FormatRelativeTimeOptions,
-  RelativeTimeUnit,
-} from './types.js';
-
-export { MF2Parser } from './parsers/mf2-parser.js';
-export { JsonLoader } from './loaders/json-loader.js';
-export {
-  formatNumber,
-  formatCurrency,
-  formatDate,
-  formatList,
-  formatRelativeTime,
-} from './formatters/formatters.js';

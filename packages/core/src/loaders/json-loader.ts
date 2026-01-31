@@ -1,33 +1,34 @@
-import type { MessageDictionary } from '../types.ts';
-import type { MessageLoader } from './loader.interface.ts';
+import type { Messages } from '../messages/messages.ts';
+import type { ILoader } from './loader.interface.ts';
 
-export class JsonLoader implements MessageLoader {
+export class JsonLoader implements ILoader {
   readonly extensions = ['.json'];
 
-  parse(content: string): MessageDictionary {
+  parse(content: string): Messages {
     try {
       const parsed = JSON.parse(content) as unknown;
 
-      if (!this.isValidDictionary(parsed)) {
-        throw new Error('Invalid message dictionary format');
+      if (!this.isValidMessages(parsed)) {
+        throw new Error('Invalid messages format!');
       }
 
       return parsed;
     } catch (error) {
       if (error instanceof SyntaxError) {
-        throw new Error(`Failed to parse JSON: ${error.message}`);
+        throw new Error(`Failed to parse JSON: ${error.message}.`);
       }
+
       throw error;
     }
   }
 
-  private isValidDictionary(value: unknown): value is MessageDictionary {
+  private isValidMessages(value: unknown): value is Messages {
     if (typeof value !== 'object' || value === null || Array.isArray(value)) {
       return false;
     }
 
     for (const val of Object.values(value)) {
-      if (typeof val !== 'string' && !this.isValidDictionary(val)) {
+      if (typeof val !== 'string' && !this.isValidMessages(val)) {
         return false;
       }
     }
@@ -35,5 +36,3 @@ export class JsonLoader implements MessageLoader {
     return true;
   }
 }
-
-export type { MessageLoader } from './loader.interface.js';
