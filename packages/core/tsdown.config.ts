@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsdown';
 
 export default defineConfig({
-  entry: ['src/i18n.ts'],
+  entry: ['src/i18n.ts', 'src/formatters/formatters.ts'],
   format: ['esm'],
   dts: true,
   clean: true,

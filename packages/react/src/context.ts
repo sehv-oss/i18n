@@ -1,9 +1,17 @@
-import { createContext } from 'react';
-import type { I18n } from '@sehv-oss/i18n';
+import * as React from 'react';
+import type { I18nInstance } from '@sehv-oss/i18n';
 
-export interface I18nContextValue {
-  i18n: I18n;
-  locale: string;
-}
+export type I18nContextValue = {
+  i18n: I18nInstance;
+};
 
-export const I18nContext = createContext<I18nContextValue | null>(null);
+export const I18nContext = React.createContext<I18nContextValue | null>(null);
+
+export const useI18nContext = () => {
+  const context = React.useContext(I18nContext);
+  if (!context) {
+    throw new Error('Context not initialized.');
+  }
+
+  return context;
+};

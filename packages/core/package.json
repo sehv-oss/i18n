@@ -14,6 +14,10 @@
     ".": {
       "types": "./dist/i18n.d.ts",
       "import": "./dist/i18n.mjs"
+    },
+    "./formatters": {
+      "types": "./dist/formatters/formatters.d.ts",
+      "import": "./dist/formatters/formatters.mjs"
     }
   },
   "keywords": [
@@ -33,9 +37,5 @@
   },
   "engines": {
     "node": ">=22 <25"
-  },
-  "devDependencies": {
-    "tsdown": "0.20.1",
-    "typescript": "5.9.3"
   }
 }

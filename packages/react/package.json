@@ -37,8 +37,6 @@
     "react": "^19.0.0"
   },
   "devDependencies": {
-    "@types/react": "^19.0.0",
-    "tsdown": "0.20.1",
-    "typescript": "5.9.3"
+    "@types/react": "^19.0.0"
   }
 }

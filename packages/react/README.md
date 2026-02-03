@@ -113,7 +113,7 @@ function MyComponent() {
 
 | Component            | Props                             |
 | -------------------- | --------------------------------- |
-| `Trans`              | `id`, `values?`                   |
+| `Translate`          | `id`, `values?`                   |
 | `FormatNumber`       | `value`, `...options`             |
 | `FormatCurrency`     | `value`, `currency`, `...options` |
 | `FormatDate`         | `value`, `...options`             |
