@@ -34,4 +34,6 @@ jobs:
 
       - uses: ./.github/actions/setup
 
+      - run: pnpm test:setup
+
       - run: pnpm test

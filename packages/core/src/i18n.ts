@@ -186,3 +186,6 @@ export class I18nInstance {
 export function createI18n(config: I18nConfig): I18nInstance {
   return new I18nInstance(config);
 }
+
+export * from './formatters/formatters.ts';
+export type * from './loaders/loader.interface.ts';

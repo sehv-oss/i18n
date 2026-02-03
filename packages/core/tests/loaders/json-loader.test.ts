@@ -4,7 +4,7 @@ import { JsonLoader } from '../../src/loaders/json-loader.ts';
 test('should support .json extension', () => {
   const loader = new JsonLoader();
 
-  expect(loader.extensions).toContain('.json');
+  expect(loader.extensions).toEqual(['.json']);
 });
 
 test('should parse valid JSON', () => {
