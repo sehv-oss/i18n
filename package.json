@@ -6,7 +6,7 @@
   "scripts": {
     "build": "pnpm -r build",
     "test": "vitest",
-    "test:setup": "pnpm exec playwright install --with-deps chromium",
+    "test:setup": "pnpm dlx playwright install chromium --with-deps",
     "test:coverage": "vitest --coverage",
     "clean": "git clean -fdX",
     "lint": "pnpm lint:cspell && pnpm lint:prettier",
