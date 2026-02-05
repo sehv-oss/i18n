@@ -5,6 +5,13 @@ React bindings for @sehv-oss/i18n.
 ## Installation
 
 ```bash
+# npm
+npm install @sehv-oss/i18n @sehv-oss/i18n-react
+
+# yarn
+yarn add @sehv-oss/i18n @sehv-oss/i18n-react
+
+# pnpm
 pnpm add @sehv-oss/i18n @sehv-oss/i18n-react
 ```
 
@@ -68,7 +75,7 @@ function MyComponent() {
 
 ```tsx
 import {
-  Trans,
+  Translate,
   FormatNumber,
   FormatCurrency,
   FormatDate,
@@ -79,7 +86,7 @@ import {
 function MyComponent() {
   return (
     <div>
-      <Trans id="greeting" values={{ name: 'World' }} />
+      <Translate id="greeting" values={{ name: 'World' }} />
       <FormatNumber value={1234.56} />
       <FormatCurrency value={99.9} currency="BRL" />
       <FormatDate value={new Date()} dateStyle="long" />

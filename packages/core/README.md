@@ -5,6 +5,13 @@ Core i18n library for JavaScript.
 ## Installation
 
 ```bash
+# npm
+npm install @sehv-oss/i18n
+
+# yarn
+yarn add @sehv-oss/i18n
+
+# pnpm
 pnpm add @sehv-oss/i18n
 ```
 
