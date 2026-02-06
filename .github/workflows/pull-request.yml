@@ -10,32 +10,42 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout
+        uses: actions/checkout@v6
 
-      - uses: ./.github/actions/setup
+      - name: Setup environment
+        uses: ./.github/actions/setup
 
-      - run: pnpm build
+      - name: Run build
+        run: pnpm build
 
   lint:
     name: Lint
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout
+        uses: actions/checkout@v6
 
-      - uses: ./.github/actions/setup
+      - name: Setup environment
+        uses: ./.github/actions/setup
 
-      - run: pnpm lint
+      - name: Run linter
+        run: pnpm lint
 
   test:
     name: Test
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout
+        uses: actions/checkout@v6
 
-      - uses: ./.github/actions/setup
+      - name: Setup environment
+        uses: ./.github/actions/setup
 
-      - run: pnpm test:setup
+      - name: Setup test environment
+        run: pnpm test:setup
 
-      - run: pnpm test
+      - name: Run tests
+        run: pnpm test

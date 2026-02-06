@@ -1,0 +1,104 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: Dry run (no publish, no PR)
+        required: false
+        default: false
+        type: boolean
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup environment
+        uses: ./.github/actions/setup
+
+      - name: Run build
+        run: pnpm build
+
+      - name: Dry run - Check versions
+        if: ${{ inputs.dry-run == true }}
+        run: |
+          echo "🔍 Checking changeset status..."
+          pnpm changeset status
+
+          echo ""
+          echo "📦 Packages that would be published:"
+          pnpm changeset status --verbose
+
+          echo ""
+          echo "🏷️ Versions that would be applied:"
+          pnpm changeset version
+          git diff --name-only
+
+          echo ""
+          echo "📝 Generated changelogs:"
+          for file in $(git diff --name-only | grep CHANGELOG); do
+            echo "--- $file ---"
+            cat "$file"
+            echo ""
+          done
+
+          echo ""
+          echo "🚀 Dry run publish output:"
+          pnpm publish -r --access public --dry-run --no-git-checks
+
+      - name: Create Release Pull Request or Publish
+        if: ${{ inputs.dry-run != true }}
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          version: pnpm changeset version
+          publish: pnpm publish -r --access public
+          title: 'chore: release packages'
+          commit: 'chore: release packages'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create GitHub Release
+        if: ${{ steps.changesets.outputs.published == 'true' }}
+        run: |
+          for pkg in $(echo '${{ steps.changesets.outputs.publishedPackages }}' | jq -r '.[] | @base64'); do
+            name=$(echo "$pkg" | base64 -d | jq -r '.name')
+            version=$(echo "$pkg" | base64 -d | jq -r '.version')
+            tag="${name}@${version}"
+
+            # Extract changelog for this version
+            pkg_dir=""
+            if [ "$name" = "@sehv-oss/i18n" ]; then
+              pkg_dir="packages/core"
+            elif [ "$name" = "@sehv-oss/i18n-react" ]; then
+              pkg_dir="packages/react"
+            fi
+
+            if [ -n "$pkg_dir" ] && [ -f "$pkg_dir/CHANGELOG.md" ]; then
+              # Extract the latest version notes from CHANGELOG
+              notes=$(awk '/^## /{if(p)exit; p=1; next} p' "$pkg_dir/CHANGELOG.md")
+            else
+              notes="Release $tag"
+            fi
+
+            echo "Creating release for $tag"
+            gh release create "$tag" \
+              --title "$tag" \
+              --notes "$notes" \
+              --verify-tag || echo "Release $tag already exists or tag not found"
+          done
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
