@@ -30,6 +30,7 @@ export class I18nInstance {
   private messageCache: MessageCache;
   private loaders: ILoader[];
   private mf2ParserByLocale: Map<string, MF2Parser>;
+  private localeChangeListeners = new Set<(locale: string) => void>();
 
   constructor(config: I18nConfig) {
     const { locale, fallbackLocale, loaders, messages } = config;
@@ -55,6 +56,15 @@ export class I18nInstance {
   public setLocale(locale: string): void {
     this.locale = locale;
     this.messageCache.clear();
+    this.localeChangeListeners.forEach((listener) => listener(locale));
+  }
+
+  public onLocaleChange(listener: (locale: string) => void): () => void {
+    this.localeChangeListeners.add(listener);
+
+    return () => {
+      this.localeChangeListeners.delete(listener);
+    };
   }
 
   public getFallbackLocale(): string | undefined {
@@ -177,9 +187,14 @@ export class I18nInstance {
 
   private extractLocaleFromUrl(url: string): string {
     const filename = url.split('/').pop() ?? '';
-    const match = filename.match(/^([a-z]{2}(?:-[A-Z]{2})?)/);
+    const name = filename.replace(/\.[^.]+$/, '');
 
-    return match?.[1] ?? this.locale;
+    try {
+      const [canonical] = Intl.getCanonicalLocales(name);
+      return canonical ?? this.locale;
+    } catch {
+      return this.locale;
+    }
   }
 }
 

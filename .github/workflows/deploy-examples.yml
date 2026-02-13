@@ -1,0 +1,52 @@
+name: Deploy Examples
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: ./.github/actions/setup
+
+      - name: Build packages
+        run: pnpm build
+
+      - name: Build examples
+        run: |
+          pnpm --filter exemplo-usando-o-core build
+          pnpm --filter exemplo-criando-um-loader-de-yaml build
+          pnpm --filter exemplo-usando-react build
+          pnpm --filter exemplos-landing build
+
+      - name: Assemble site
+        run: |
+          mkdir -p _site
+          cp -r exemplos/landing/dist/* _site/
+          cp -r exemplos/usando-o-core/dist _site/usando-o-core
+          cp -r exemplos/criando-um-loader-de-yaml/dist _site/criando-um-loader-de-yaml
+          cp -r exemplos/usando-react/dist _site/usando-react
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

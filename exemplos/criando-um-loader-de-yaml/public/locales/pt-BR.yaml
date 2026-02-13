@@ -1,0 +1,7 @@
+greeting: "Olá, {$name}!"
+subtitle: "Carregado do YAML — idioma: {$locale}"
+items: |
+  .match {$count :number}
+  one {{Você tem {$count} item}}
+  *   {{Você tem {$count} itens}}
+farewell: "Até logo, {$name}!"

@@ -27,12 +27,6 @@ export class JsonLoader implements ILoader {
       return false;
     }
 
-    for (const val of Object.values(value)) {
-      if (typeof val !== 'string' && !this.isValidMessages(val)) {
-        return false;
-      }
-    }
-
-    return true;
+    return Object.values(value).every((val) => typeof val === 'string');
   }
 }
