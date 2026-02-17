@@ -12,26 +12,26 @@ pnpm build
 
 ## Exemplos disponíveis
 
-| Exemplo                                              | Descrição                                           |
-| ---------------------------------------------------- | --------------------------------------------------- |
-| [usando-o-core](./usando-o-core)                     | Uso básico do core com vanilla JS/TS                |
+| Exemplo                                                  | Descrição                                           |
+| -------------------------------------------------------- | --------------------------------------------------- |
+| [usando-o-core](./usando-o-core)                         | Uso básico do core com vanilla JS/TS                |
 | [criando-um-loader-de-yaml](./criando-um-loader-de-yaml) | Como criar um loader customizado para arquivos YAML |
-| [usando-react](./usando-react)                       | Integração com React (hooks e components)           |
+| [usando-react](./usando-react)                           | Integração com React (hooks e components)           |
 
 ## Como rodar
 
-Cada exemplo é um projeto Vite independente. Para rodar:
+Todos os exemplos rodam em um único projeto Vite com multi-page.
+Um único `pnpm dev` sobe a landing page com navegação entre os exemplos:
 
 ```bash
-# A partir da raiz do monorepo
-cd exemplos/<nome-do-exemplo>
+cd exemplos
 pnpm dev
 ```
 
-Ou usando o filtro do pnpm:
+Ou a partir da raiz do monorepo:
 
 ```bash
-pnpm --filter exemplo-usando-o-core dev
-pnpm --filter exemplo-criando-um-loader-de-yaml dev
-pnpm --filter exemplo-usando-react dev
+pnpm --filter exemplos dev
 ```
+
+A landing page exibe uma sidebar com todos os exemplos disponíveis. Cada exemplo é carregado via iframe, sem necessidade de rodar servidores separados.

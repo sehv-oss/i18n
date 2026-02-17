@@ -1,5 +1,5 @@
 {
-  "name": "exemplo-usando-react",
+  "name": "exemplos",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -12,7 +12,8 @@
     "@sehv-oss/i18n": "workspace:*",
     "@sehv-oss/i18n-react": "workspace:*",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "yaml": "^2.7.0"
   },
   "devDependencies": {
     "@types/react": "^19.0.0",

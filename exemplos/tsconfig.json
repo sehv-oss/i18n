@@ -9,5 +9,5 @@
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true
   },
-  "include": ["src"]
+  "include": ["usando-o-core", "criando-um-loader-de-yaml", "usando-react/src"]
 }
