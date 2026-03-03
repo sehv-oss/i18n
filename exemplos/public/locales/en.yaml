@@ -1,7 +1,0 @@
-greeting: "Hello, {$name}!"
-subtitle: "Loaded from YAML — locale: {$locale}"
-items: |
-  .match {$count :number}
-  one {{You have {$count} item}}
-  *   {{You have {$count} items}}
-farewell: "Goodbye, {$name}!"
