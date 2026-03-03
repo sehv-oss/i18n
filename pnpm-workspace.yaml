@@ -1,5 +1,5 @@
 packages:
   - 'packages/core'
   - 'packages/react'
-  - 'exemplos'
+  - 'examples'
 engineStrict: true
