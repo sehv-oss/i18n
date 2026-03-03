@@ -70,11 +70,10 @@ await i18n.loadMessagesAsync('/locales/en.json');
 ### Custom Loader
 
 ```typescript
-import { createI18n } from '@sehv-oss/i18n';
-import type { MessageLoader } from '@sehv-oss/i18n/loaders';
+import { createI18n, type ILoader } from '@sehv-oss/i18n';
 import YAML from 'yaml';
 
-const yamlLoader: MessageLoader = {
+const yamlLoader: ILoader = {
   extensions: ['.yaml', '.yml'],
   parse(content) {
     return YAML.parse(content);
@@ -109,6 +108,7 @@ Creates an i18n instance.
 | `loadMessagesAsync(url)`                    | Load messages via fetch     |
 | `setLocale(locale)`                         | Change current locale       |
 | `getLocales()`                              | Get available locales       |
+| `onLocaleChange(listener)`                  | Subscribe to locale changes |
 
 ## License
 
