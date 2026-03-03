@@ -70,8 +70,7 @@ await i18n.loadMessagesAsync('/locales/en.json');
 ### Custom Loader
 
 ```typescript
-import { createI18n } from '@sehv-oss/i18n';
-import type { ILoader } from '@sehv-oss/i18n';
+import { createI18n, type ILoader } from '@sehv-oss/i18n';
 import YAML from 'yaml';
 
 const yamlLoader: ILoader = {
