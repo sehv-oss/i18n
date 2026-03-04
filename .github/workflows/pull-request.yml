@@ -3,49 +3,7 @@ name: Pull Request
 on:
   pull_request:
 
-concurrency: ${{ github.workflow }}-${{ github.ref }}
-
 jobs:
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup environment
-        uses: ./.github/actions/setup
-
-      - name: Run build
-        run: pnpm build
-
-  lint:
-    name: Lint
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup environment
-        uses: ./.github/actions/setup
-
-      - name: Run linter
-        run: pnpm lint
-
-  test:
-    name: Test
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup environment
-        uses: ./.github/actions/setup
-
-      - name: Setup test environment
-        run: pnpm test:setup
-
-      - name: Run tests
-        run: pnpm test
+  pull-request-check:
+    uses: sehv-oss/actions/.github/workflows/pull-request-node-pnpm.yaml@main
+    secrets: inherit
