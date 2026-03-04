@@ -4,6 +4,6 @@ on:
   pull_request:
 
 jobs:
-  pull-request-check:
+  pull-request:
     uses: sehv-oss/actions/.github/workflows/pull-request-node-pnpm.yaml@main
     secrets: inherit
