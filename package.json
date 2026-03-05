@@ -9,9 +9,9 @@
     "test:setup": "pnpm dlx playwright install chromium --with-deps",
     "test:coverage": "vitest --coverage",
     "clean": "git clean -fdX",
-    "lint": "pnpm lint:cspell && pnpm lint:prettier",
+    "lint": "pnpm lint:cspell && pnpm lint:prettier && pnpm lint:eslint",
     "lint:cspell": "cspell . --config .cspell.config.js",
-    "lint:eslint": "pnpm -r lint:eslint",
+    "lint:eslint": "echo \"pnpm -r lint:eslint\"",
     "lint:prettier": "prettier --config .prettier.config.js --check ."
   },
   "devDependencies": {

@@ -20,4 +20,4 @@ Modern i18n library for JavaScript. Web standards based, runs everywhere.
 
 ## License
 
-MIT
+ISC
