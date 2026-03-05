@@ -112,4 +112,4 @@ Creates an i18n instance.
 
 ## License
 
-MIT
+ISC

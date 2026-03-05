@@ -1,0 +1,29 @@
+{
+  "name": "@sehv-oss/i18n-examples",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@sehv-oss/i18n": "workspace:*",
+    "@sehv-oss/i18n-react": "workspace:*",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "yaml": "2.8.2",
+    "shiki": "4.0.1"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "5.1.4",
+    "autoprefixer": "10.4.27",
+    "postcss": "8.5.8",
+    "tailwindcss": "4.2.1",
+    "@tailwindcss/vite": "4.2.1",
+    "vite": "7.3.1"
+  }
+}
