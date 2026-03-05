@@ -4,5 +4,9 @@
     "lib": ["ESNext", "DOM"],
     "jsx": "react-jsx"
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx"]
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "references": [
+    { "path": "../packages/core" },
+    { "path": "../packages/react" }
+  ]
 }

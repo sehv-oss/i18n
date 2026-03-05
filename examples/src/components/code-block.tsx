@@ -1,16 +1,17 @@
+import * as React from 'react';
+import type { BundledLanguage } from 'shiki';
+
 import { useHighlightedCode } from '../hooks/use-highlighted-code.ts';
 
 type CodeBlockProps = {
   code: string;
-  lang?: string;
+  lang: BundledLanguage;
   filename?: string;
 };
 
-export function CodeBlock({
-  code,
-  lang = 'typescript',
-  filename,
-}: CodeBlockProps) {
+export function CodeBlock(props: CodeBlockProps): React.ReactElement {
+  const { code, lang, filename } = props;
+
   const html = useHighlightedCode(code, lang);
 
   return (

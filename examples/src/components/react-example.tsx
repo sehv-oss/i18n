@@ -1,3 +1,5 @@
+import * as React from 'react';
+
 import { createI18n } from '@sehv-oss/i18n';
 import {
   I18nProvider,
@@ -13,6 +15,7 @@ import {
   FormatList,
   FormatRelativeTime,
 } from '@sehv-oss/i18n-react';
+
 import { Section } from './section.tsx';
 import { CodeBlock } from './code-block.tsx';
 
@@ -31,15 +34,23 @@ const i18n = createI18n({
   },
 });
 
-const HOOKS_CODE = `
+const CODE = `
 import { createI18n } from '@sehv-oss/i18n';
 import {
   I18nProvider,
+  // Hooks
   useTranslate,
   useLocale,
   useFormatNumber,
   useFormatCurrency,
   useFormatDate,
+  // Components
+  Translate,
+  FormatNumber,
+  FormatCurrency,
+  FormatDate,
+  FormatList,
+  FormatRelativeTime,
 } from '@sehv-oss/i18n-react';
 
 const i18n = createI18n({
@@ -50,7 +61,7 @@ const i18n = createI18n({
   },
 });
 
-function MyComponent() {
+function Hooks(): React.ReactElement {
   const translate = useTranslate();
   const [locale, setLocale] = useLocale();
   const formatNumber = useFormatNumber();
@@ -68,26 +79,7 @@ function MyComponent() {
   );
 }
 
-function App() {
-  return (
-    <I18nProvider i18n={i18n}>
-      <MyComponent />
-    </I18nProvider>
-  );
-}
-`;
-
-const COMPONENTS_CODE = `
-import {
-  Translate,
-  FormatNumber,
-  FormatCurrency,
-  FormatDate,
-  FormatList,
-  FormatRelativeTime,
-} from '@sehv-oss/i18n-react';
-
-function MyComponent() {
+function Components(): React.ReactElement {
   return (
     <div>
       <Translate id="greeting" values={{ name: 'World' }} />
@@ -99,9 +91,17 @@ function MyComponent() {
     </div>
   );
 }
+
+function App(): React.ReactElement {
+  return (
+    <I18nProvider i18n={i18n}>
+      <Hooks />
+    </I18nProvider>
+  );
+}
 `;
 
-function ReactDemo() {
+function ReactDemo(): React.ReactElement {
   const translate = useTranslate();
   const [locale, setLocale] = useLocale();
   const formatNumber = useFormatNumber();
@@ -133,9 +133,7 @@ function ReactDemo() {
 
       <div className="space-y-3 sm:space-y-4">
         <div>
-          <p className="text-[10px] sm:text-xs font-mono text-zinc-500 mb-2">
-            Hooks API
-          </p>
+          <p className="sm:text-xs font-mono text-zinc-500 mb-2">Hooks API</p>
           <div className="space-y-2">
             {[
               {
@@ -153,7 +151,7 @@ function ReactDemo() {
               },
             ].map(({ label, value }) => (
               <div key={label} className="flex flex-col gap-1 min-w-0">
-                <span className="text-[10px] sm:text-xs font-mono text-zinc-500 truncate">
+                <span className="sm:text-xs font-mono text-zinc-500 truncate">
                   {label}
                 </span>
                 <span className="text-xs sm:text-sm font-mono text-violet-400 bg-zinc-800/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 truncate">
@@ -165,7 +163,7 @@ function ReactDemo() {
         </div>
 
         <div>
-          <p className="text-[10px] sm:text-xs font-mono text-zinc-500 mb-2">
+          <p className="sm:text-xs font-mono text-zinc-500 mb-2">
             Components API
           </p>
           <div className="space-y-2">
@@ -196,7 +194,7 @@ function ReactDemo() {
               },
             ].map(({ label, value }) => (
               <div key={label} className="flex flex-col gap-1 min-w-0">
-                <span className="text-[10px] sm:text-xs font-mono text-zinc-500 truncate">
+                <span className="sm:text-xs font-mono text-zinc-500 truncate">
                   {label}
                 </span>
                 <span className="text-xs sm:text-sm font-mono text-violet-400 bg-zinc-800/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 truncate">
@@ -211,7 +209,7 @@ function ReactDemo() {
   );
 }
 
-export function ReactExample() {
+export function ReactExample(): React.ReactElement {
   return (
     <Section
       id="react"
@@ -221,12 +219,7 @@ export function ReactExample() {
     >
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <div className="space-y-6">
-          <CodeBlock code={HOOKS_CODE} lang="tsx" filename="hooks-api.tsx" />
-          <CodeBlock
-            code={COMPONENTS_CODE}
-            lang="tsx"
-            filename="components-api.tsx"
-          />
+          <CodeBlock code={CODE} lang="tsx" filename="hooks-api.tsx" />
         </div>
 
         <I18nProvider i18n={i18n}>

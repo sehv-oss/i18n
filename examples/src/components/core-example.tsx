@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import * as React from 'react';
+
 import { createI18n } from '@sehv-oss/i18n';
+
 import { Section } from './section.tsx';
 import { CodeBlock } from './code-block.tsx';
 
@@ -65,13 +67,15 @@ i18n.formatRelativeTime(-2, 'days');
 i18n.setLocale('pt');
 `;
 
-export function CoreExample() {
-  const [locale, setLocale] = useState('en');
+export function CoreExample(): React.ReactElement {
+  const [locale, setLocale] = React.useState('en');
 
-  function handleLocaleChange(newLocale: string) {
-    setLocale(newLocale);
-    i18n.setLocale(newLocale);
-  }
+  const handleLocaleChange = (newLocale: string) => {
+    return (): void => {
+      setLocale(newLocale);
+      i18n.setLocale(newLocale);
+    };
+  };
 
   const outputs = [
     {
@@ -113,7 +117,7 @@ export function CoreExample() {
       description="Built on Web Standards (Intl API + MessageFormat 2.0). Works in browsers, Node.js, Bun, and Deno with zero dependencies."
     >
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-        <CodeBlock code={CODE} filename="example.ts" />
+        <CodeBlock code={CODE} filename="example.ts" lang="typescript" />
 
         <div className="rounded-lg sm:rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 sm:p-6 flex flex-col gap-3 sm:gap-4 min-w-0">
           <div className="flex items-center justify-between">
@@ -121,17 +125,17 @@ export function CoreExample() {
               Live Output
             </h3>
             <div className="flex gap-2">
-              {['en', 'pt'].map((l) => (
+              {['en', 'pt'].map((language) => (
                 <button
-                  key={l}
-                  onClick={() => handleLocaleChange(l)}
+                  key={language}
+                  onClick={handleLocaleChange(language)}
                   className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
-                    locale === l
+                    locale === language
                       ? 'bg-blue-500 text-white'
                       : 'bg-zinc-800 text-zinc-400 hover:text-zinc-200'
                   }`}
                 >
-                  {l.toUpperCase()}
+                  {language.toUpperCase()}
                 </button>
               ))}
             </div>

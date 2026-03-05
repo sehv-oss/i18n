@@ -1,20 +1,15 @@
-import type { ReactNode } from 'react';
+import * as React from 'react';
 
-type SectionProps = {
+type SectionProps = React.PropsWithChildren<{
   id: string;
   title: string;
   description: string;
   badge: string;
-  children: ReactNode;
-};
+}>;
 
-export function Section({
-  id,
-  title,
-  description,
-  badge,
-  children,
-}: SectionProps) {
+export function Section(props: SectionProps): React.ReactElement {
+  const { id, title, description, badge, children } = props;
+
   return (
     <section id={id} className="scroll-mt-24">
       <div className="mb-8">

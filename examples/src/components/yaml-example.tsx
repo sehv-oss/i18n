@@ -1,3 +1,5 @@
+import type * as React from 'react';
+
 import { Section } from './section.tsx';
 import { CodeBlock } from './code-block.tsx';
 
@@ -55,7 +57,7 @@ const csvLoader: ILoader = {
 };
 `;
 
-export function YamlExample() {
+export function YamlExample(): React.ReactElement {
   return (
     <Section
       id="yaml"
@@ -65,8 +67,16 @@ export function YamlExample() {
     >
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <div className="space-y-6">
-          <CodeBlock code={YAML_LOADER_CODE} filename="yaml-loader.ts" />
-          <CodeBlock code={CUSTOM_LOADER_CODE} filename="csv-loader.ts" />
+          <CodeBlock
+            code={YAML_LOADER_CODE}
+            filename="yaml-loader.ts"
+            lang="typescript"
+          />
+          <CodeBlock
+            code={CUSTOM_LOADER_CODE}
+            filename="csv-loader.ts"
+            lang="typescript"
+          />
         </div>
 
         <div className="space-y-6">

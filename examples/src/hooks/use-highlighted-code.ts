@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
-import { codeToHtml } from 'shiki';
+import { type BundledLanguage, codeToHtml } from 'shiki';
 
-export function useHighlightedCode(code: string, lang: string = 'typescript') {
+export function useHighlightedCode(
+  code: string,
+  lang: BundledLanguage
+): string {
   const [html, setHtml] = useState('');
 
   useEffect(() => {

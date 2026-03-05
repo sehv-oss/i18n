@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { CoreExample } from './components/core-example.tsx';
+import { InstallTabs } from './components/install-tabs.tsx';
 import { ReactExample } from './components/react-example.tsx';
 import { YamlExample } from './components/yaml-example.tsx';
 
@@ -14,7 +15,7 @@ export function App() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 font-[var(--font-sans)]">
-      <header className="sticky top-0 z-50 border-b border-zinc-800/50 bg-zinc-950/80 backdrop-blur-xl">
+      <header className="fixed top-0 left-0 right-0 z-50 border-b border-zinc-800/50 bg-zinc-950/80 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between">
           <div className="flex items-center gap-2 sm:gap-3">
             <span className="text-base sm:text-lg font-bold tracking-tight">
@@ -105,7 +106,7 @@ export function App() {
         )}
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 pt-14 sm:pt-16">
         <section className="py-14 sm:py-20 md:py-28 text-center">
           <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full border border-zinc-800 bg-zinc-900/50 text-xs sm:text-sm text-zinc-400 mb-6 sm:mb-8">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -157,6 +158,8 @@ export function App() {
               <span>Runtimes</span>
             </div>
           </div>
+
+          <InstallTabs />
         </section>
 
         <div className="space-y-16 sm:space-y-24 pb-16 sm:pb-24">
@@ -168,7 +171,7 @@ export function App() {
 
       <footer className="border-t border-zinc-800/50 py-6 sm:py-8">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 text-xs sm:text-sm text-zinc-500">
-          <span>MIT License — @sehv-oss/i18n</span>
+          <span>ISC License — @sehv-oss/i18n</span>
           <a
             href="https://github.com/sehv-oss/i18n"
             target="_blank"

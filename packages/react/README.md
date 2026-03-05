@@ -129,4 +129,4 @@ function MyComponent() {
 
 ## License
 
-MIT
+ISC
