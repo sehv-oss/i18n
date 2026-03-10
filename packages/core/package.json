@@ -7,7 +7,7 @@
     "build": "tsdown"
   },
   "files": [
-    "dist"
+    "./dist"
   ],
   "exports": {
     "./package.json": "./package.json",

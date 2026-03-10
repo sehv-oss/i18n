@@ -8,7 +8,7 @@
     "lint:eslint": "eslint ."
   },
   "files": [
-    "dist"
+    "./dist"
   ],
   "exports": {
     "./package.json": "./package.json",
