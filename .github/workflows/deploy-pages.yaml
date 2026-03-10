@@ -1,0 +1,19 @@
+name: Deploy Pages
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    uses: sehv-oss/actions/.github/workflows/deploy-pages-node-pnpm.yaml@main
+    with:
+      build-command: pnpm build
+      output-path: ./examples/dist
+    secrets: inherit
