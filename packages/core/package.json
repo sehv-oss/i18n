@@ -35,6 +35,10 @@
     "url": "https://github.com/sehv-oss/i18n.git",
     "directory": "packages/core"
   },
+  "homepage": "https://sehv-oss.github.io/i18n/",
+  "bugs": {
+    "url": "https://github.com/sehv-oss/i18n/issues"
+  },
   "engines": {
     "node": ">=22 <25"
   }
