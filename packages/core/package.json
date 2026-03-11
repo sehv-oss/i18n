@@ -1,6 +1,6 @@
 {
   "name": "@sehv-oss/i18n",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Modern i18n library for JavaScript. Web standards based, runs everywhere.",
   "type": "module",
   "scripts": {
