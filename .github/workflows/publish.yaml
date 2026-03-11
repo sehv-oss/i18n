@@ -1,0 +1,16 @@
+name: Publish
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    if: "${{ github.event.pull_request.merged == true && startsWith(github.event.pull_request.title, 'chore: version packages') }}"
+    uses: sehv-oss/actions/.github/workflows/publish-node-pnpm.yaml@main
+    secrets: inherit
