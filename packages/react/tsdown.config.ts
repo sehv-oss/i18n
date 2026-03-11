@@ -7,6 +7,6 @@ export default defineConfig({
   clean: true,
   target: 'es2022',
   minify: true,
-  sourcemap: false,
+  sourcemap: true,
   external: ['react', '@sehv-oss/i18n'], // TODO: read peers from package.json
 });
