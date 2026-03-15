@@ -8,9 +8,23 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 jobs:
-  publish:
+  check:
+    runs-on: ubuntu-latest
     if: "${{ github.event.pull_request.merged == true && startsWith(github.event.pull_request.title, 'chore: version packages') }}"
+
+  packages:
+    needs: check
     uses: sehv-oss/actions/.github/workflows/publish-node-pnpm.yaml@main
+    secrets: inherit
+
+  pages:
+    needs: check
+    uses: sehv-oss/actions/.github/workflows/deploy-pages-node-pnpm.yaml@main
+    with:
+      build-command: pnpm build
+      output-path: ./examples/dist/
     secrets: inherit
