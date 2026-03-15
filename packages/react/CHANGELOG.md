@@ -1,5 +1,15 @@
 # @sehv-oss/i18n-react
 
+## 1.0.1
+
+### Patch Changes
+
+- 3e529ea: feat: enabled sourcemaps
+- 42c0ec3: fix: added package json complementations
+- Updated dependencies [3e529ea]
+- Updated dependencies [42c0ec3]
+  - @sehv-oss/i18n@1.0.1
+
 ## 1.0.0
 
 ### Major Changes

@@ -1,6 +1,6 @@
 {
   "name": "@sehv-oss/i18n-react",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "React bindings for @sehv-oss/i18n",
   "type": "module",
   "scripts": {
