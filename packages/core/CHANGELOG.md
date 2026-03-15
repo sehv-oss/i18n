@@ -1,5 +1,12 @@
 # @sehv-oss/i18n
 
+## 1.0.1
+
+### Patch Changes
+
+- 3e529ea: feat: enabled sourcemaps
+- 42c0ec3: fix: added package json complementations
+
 ## 1.0.0
 
 ### Major Changes
