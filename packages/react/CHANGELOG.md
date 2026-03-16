@@ -1,5 +1,13 @@
 # @sehv-oss/i18n-react
 
+## 1.0.2
+
+### Patch Changes
+
+- b24726b: fix: export dts files right
+- Updated dependencies [b24726b]
+  - @sehv-oss/i18n@1.0.2
+
 ## 1.0.1
 
 ### Patch Changes
