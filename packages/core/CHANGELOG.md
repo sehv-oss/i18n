@@ -1,5 +1,11 @@
 # @sehv-oss/i18n
 
+## 1.0.2
+
+### Patch Changes
+
+- b24726b: fix: export dts files right
+
 ## 1.0.1
 
 ### Patch Changes
