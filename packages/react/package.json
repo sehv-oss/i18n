@@ -13,7 +13,7 @@
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "types": "./dist/react.d.ts",
+      "types": "./dist/react.d.mts",
       "import": "./dist/react.mjs"
     }
   },
