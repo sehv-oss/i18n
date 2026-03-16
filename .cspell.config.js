@@ -13,6 +13,6 @@ export default defineConfig({
     'vindo',
     'você',
   ],
-  ignorePaths: ['pnpm-lock.yaml'],
+  ignorePaths: ['pnpm-lock.yaml', 'CHANGELOG.md'],
   useGitignore: true,
 });
