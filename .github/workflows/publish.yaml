@@ -1,8 +1,7 @@
 name: Publish
 
 on:
-  pull_request:
-    types: [closed]
+  push:
     branches:
       - main
 
@@ -14,7 +13,7 @@ permissions:
 jobs:
   check:
     runs-on: ubuntu-latest
-    if: "${{ github.event.pull_request.merged == true && startsWith(github.event.pull_request.title, 'chore: version packages') }}"
+    if: "${{ startsWith(github.event.head_commit.message, 'chore: version packages') }}"
     steps:
       - run: echo "Conditions met. Proceeding with publish."
 
