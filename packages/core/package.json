@@ -12,7 +12,7 @@
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "types": "./dist/i18n.d.ts",
+      "types": "./dist/i18n.d.mts",
       "import": "./dist/i18n.mjs"
     },
     "./formatters": {
