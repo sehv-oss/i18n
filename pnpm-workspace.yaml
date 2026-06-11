@@ -2,4 +2,8 @@ packages:
   - 'packages/core'
   - 'packages/react'
   - 'examples'
+
+allowBuilds:
+  esbuild: false
+
 engineStrict: true

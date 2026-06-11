@@ -40,6 +40,11 @@
     "url": "https://github.com/sehv-oss/i18n/issues"
   },
   "engines": {
-    "node": ">=22 <25"
+    "node": ">=22 <27"
+  },
+  "devDependencies": {
+    "tsdown": "0.22.2",
+    "typescript": "6.0.3",
+    "vitest": "4.1.8"
   }
 }

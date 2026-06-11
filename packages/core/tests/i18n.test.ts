@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi, afterEach, test } from 'vitest';
+import { expect, vi, test } from 'vitest';
 import { createI18n, I18nInstance } from '../src/i18n.ts';
 
 test('should create an default I18nInstance', () => {
