@@ -11,18 +11,18 @@
   "dependencies": {
     "@sehv-oss/i18n": "workspace:*",
     "@sehv-oss/i18n-react": "workspace:*",
-    "react": "19.2.7",
-    "react-dom": "19.2.7",
-    "yaml": "2.9.0",
-    "shiki": "4.2.0"
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "yaml": "catalog:",
+    "shiki": "catalog:"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "4.3.0",
-    "@vitejs/plugin-react": "6.0.2",
-    "autoprefixer": "10.5.0",
-    "postcss": "8.5.15",
-    "tailwindcss": "4.3.0",
-    "typescript": "6.0.3",
-    "vite": "8.0.16"
+    "@tailwindcss/vite": "catalog:",
+    "@vitejs/plugin-react": "catalog:",
+    "autoprefixer": "catalog:",
+    "postcss": "catalog:",
+    "tailwindcss": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:"
   }
 }

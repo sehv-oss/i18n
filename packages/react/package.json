@@ -41,10 +41,10 @@
     "react": "^19.0.0"
   },
   "devDependencies": {
-    "@types/react": "^19.0.0",
-    "tsdown": "0.22.2",
-    "typescript": "6.0.3",
-    "vitest-browser-react": "2.2.0",
-    "vitest": "4.1.8"
+    "@types/react": "catalog:",
+    "tsdown": "catalog:",
+    "typescript": "catalog:",
+    "vitest-browser-react": "catalog:",
+    "vitest": "catalog:"
   }
 }
