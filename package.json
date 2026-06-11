@@ -9,7 +9,7 @@
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",
     "test": "vitest",
-    "test:setup": "pnpm exec playwright install chromium --with-deps",
+    "test:setup": "pnpm dlx playwright install chromium --with-deps",
     "test:coverage": "vitest --coverage",
     "clean": "git clean -fdX",
     "lint": "pnpm lint:cspell && pnpm lint:prettier && pnpm lint:eslint",
