@@ -17,7 +17,7 @@ permissions:
 jobs:
   check:
     runs-on: ubuntu-latest
-    if: "${{ startsWith(github.event.head_commit.message, 'chore: version packages') }}"
+    if: "${{ startsWith(github.event.head_commit.message, 'chore: release') }}"
     steps:
       - run: echo "Conditions met. Proceeding with publish."
 
