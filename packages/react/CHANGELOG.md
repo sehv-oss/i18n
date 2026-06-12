@@ -1,5 +1,16 @@
 # @sehv-oss/i18n-react
 
+## 2.0.0
+
+### Minor Changes
+
+- 757a6b0: chore: bump deps and pnpm catalogs
+
+### Patch Changes
+
+- Updated dependencies [757a6b0]
+  - @sehv-oss/i18n@1.1.0
+
 ## 1.0.2
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @sehv-oss/i18n
 
+## 1.1.0
+
+### Minor Changes
+
+- 757a6b0: chore: bump deps and pnpm catalogs
+
 ## 1.0.2
 
 ### Patch Changes
