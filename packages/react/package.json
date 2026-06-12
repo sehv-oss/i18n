@@ -34,13 +34,17 @@
     "url": "https://github.com/sehv-oss/i18n/issues"
   },
   "engines": {
-    "node": ">=22 <25"
+    "node": ">=22 <27"
   },
   "peerDependencies": {
     "@sehv-oss/i18n": "workspace:*",
     "react": "^19.0.0"
   },
   "devDependencies": {
-    "@types/react": "^19.0.0"
+    "@types/react": "catalog:",
+    "tsdown": "catalog:",
+    "typescript": "catalog:",
+    "vitest-browser-react": "catalog:",
+    "vitest": "catalog:"
   }
 }
