@@ -8,7 +8,4 @@ export default defineConfig({
   target: 'es2022',
   minify: true,
   sourcemap: true,
-  deps: {
-    neverBundle: ['react', '@sehv-oss/i18n'], // TODO: read peers from package.json
-  },
 });
