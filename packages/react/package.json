@@ -38,7 +38,7 @@
   },
   "peerDependencies": {
     "@sehv-oss/i18n": "workspace:*",
-    "react": "^19.0.0"
+    "react": "catalog:"
   },
   "devDependencies": {
     "@types/react": "catalog:",
