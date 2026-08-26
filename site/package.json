@@ -1,5 +1,5 @@
 {
-  "name": "@sehv-oss/i18n-examples",
+  "name": "@sehv-oss/i18n-site",
   "version": "0.0.1",
   "private": true,
   "type": "module",
@@ -18,6 +18,8 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "catalog:",
     "autoprefixer": "catalog:",
     "postcss": "catalog:",

@@ -1,0 +1,16 @@
+{
+  "extends": "../../../../tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ESNext", "DOM"],
+    "jsx": "react-jsx",
+    "composite": false,
+    "declaration": false,
+    "emitDeclarationOnly": false,
+    "noEmit": true,
+    "paths": {
+      "@sehv-oss/i18n": ["../../../core/src/i18n.ts"],
+      "@sehv-oss/i18n-react": ["../../src/react.ts"]
+    }
+  },
+  "include": ["./**/*.ts", "./**/*.tsx"]
+}

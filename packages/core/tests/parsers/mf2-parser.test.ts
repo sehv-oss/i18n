@@ -1,5 +1,16 @@
-import { expect, test } from 'vitest';
+import { expect, test, vi } from 'vitest';
 import { MF2Parser } from '../../src/parsers/mf2-parser.ts';
+
+const PLURAL = `.input {$count :number}
+.match $count
+one {{You have {$count} item}}
+*   {{You have {$count} items}}`;
+
+const GENDER = `.input {$gender :string}
+.match $gender
+male   {{He went to the store}}
+female {{She went to the store}}
+*      {{They went to the store}}`;
 
 test('should interpolate variables', () => {
   const parser = new MF2Parser('en');
@@ -28,78 +39,92 @@ test('should keep placeholder if value not provided', () => {
   expect(result).toBe('Hello, {$name}!');
 });
 
+test('should report an unresolved variable through onError', () => {
+  const parser = new MF2Parser('en');
+  const onError = vi.fn();
+
+  parser.parse('Hello, {$name}!', {}, onError);
+
+  expect(onError).toHaveBeenCalledOnce();
+});
+
+test('should stay silent when no error handler is given', () => {
+  const parser = new MF2Parser('en');
+
+  expect(() => parser.parse('Hello, {$name}!', {})).not.toThrow();
+});
+
 test('should select correct plural form for English', () => {
   const parser = new MF2Parser('en');
 
-  const message = `.match {$count :number}
-one {{You have {$count} item}}
-*   {{You have {$count} items}}`;
-  const result1 = parser.parse(message, { count: 1 });
-  const result5 = parser.parse(message, { count: 5 });
+  const result1 = parser.parse(PLURAL, { count: 1 });
+  const result5 = parser.parse(PLURAL, { count: 5 });
 
   expect(result1).toBe('You have 1 item');
   expect(result5).toBe('You have 5 items');
 });
 
 test('should select correct plural form for other locales', () => {
-  const parser = new MF2Parser('de');
+  const parser = new MF2Parser('pl');
+  const message = `.input {$count :number}
+.match $count
+one  {{{$count} plik}}
+few  {{{$count} pliki}}
+many {{{$count} plików}}
+*    {{{$count} pliku}}`;
 
-  const message = `.match {$count :number}
-one {{You have {$count} item}}
-*   {{You have {$count} items}}`;
-  const result1 = parser.parse(message, { count: 1 });
-  const result5 = parser.parse(message, { count: 5 });
+  expect(parser.parse(message, { count: 1 })).toBe('1 plik');
+  expect(parser.parse(message, { count: 3 })).toBe('3 pliki');
+  expect(parser.parse(message, { count: 5 })).toBe('5 plików');
+});
 
-  expect(result1).toBe('You have 1 item');
-  expect(result5).toBe('You have 5 items');
+test('should prefer an exact numeric key over the plural category', () => {
+  const parser = new MF2Parser('en');
+  const message = `.input {$count :number}
+.match $count
+0   {{No items}}
+one {{One item}}
+*   {{{$count} items}}`;
+
+  expect(parser.parse(message, { count: 0 })).toBe('No items');
+  expect(parser.parse(message, { count: 1 })).toBe('One item');
+  expect(parser.parse(message, { count: 7 })).toBe('7 items');
 });
 
 test('should select based on string value', () => {
   const parser = new MF2Parser('en');
-  const message = `.match {$gender}
-male   {{He went to the store}}
-female {{She went to the store}}
-*      {{They went to the store}}`;
-  const resultMale = parser.parse(message, { gender: 'male' });
-  const resultFemale = parser.parse(message, { gender: 'female' });
-  const resultOther = parser.parse(message, { gender: 'other' });
+
+  const resultMale = parser.parse(GENDER, { gender: 'male' });
+  const resultFemale = parser.parse(GENDER, { gender: 'female' });
+  const resultOther = parser.parse(GENDER, { gender: 'other' });
 
   expect(resultMale).toBe('He went to the store');
   expect(resultFemale).toBe('She went to the store');
   expect(resultOther).toBe('They went to the store');
 });
 
-test('should return simple pattern when first line does not start with .match', () => {
+test('should resolve a local declaration', () => {
   const parser = new MF2Parser('en');
-  const message = `some text
-.match {$count :number}
-one {{One}}
-*   {{Many}}`;
-
-  const result = parser.parse(message, { count: 1 });
-
-  expect(result).toBe(message);
-});
-
-test('should return original message when match has no selectors', () => {
-  const parser = new MF2Parser('en');
-  const message = `.match
-one {{One item}}
-*   {{Multiple items}}`;
-
-  const result = parser.parse(message, {});
-
-  expect(result).toBe(message);
-});
-
-test('should return empty string when no variant matches and no fallback', () => {
-  const parser = new MF2Parser('en');
-  const message = `.match {$count :number}
-one {{One item}}`;
+  const message = `.local $total = {$count :number}
+{{Total: {$total}}}`;
 
   const result = parser.parse(message, { count: 5 });
 
-  expect(result).toBe('');
+  expect(result).toBe('Total: 5');
+});
+
+test('should format with the draft functions', () => {
+  const parser = new MF2Parser('en');
+
+  const date = parser.parse('Today is {$d :date style=long}', {
+    d: new Date('2025-03-01T12:00:00Z'),
+  });
+  const currency = parser.parse('Cost {$v :currency currency=USD}', {
+    v: 99.9,
+  });
+
+  expect(date).toBe('Today is Mar 1, 2025');
+  expect(currency).toBe('Cost $99.90');
 });
 
 test('should handle empty message', () => {
@@ -110,44 +135,52 @@ test('should handle empty message', () => {
   expect(result).toBe('');
 });
 
-test('should handle whitespace only message', () => {
+test('should preserve a whitespace only message', () => {
   const parser = new MF2Parser('en');
 
   const result = parser.parse('   ', {});
 
-  expect(result).toBe('');
+  expect(result).toBe('   ');
 });
 
-test('should handle undefined value as wildcard', () => {
-  const parser = new MF2Parser('en');
-  const message = `.match {$status}
-active   {{Active}}
-*        {{Unknown}}`;
-
-  const result = parser.parse(message, {});
-
-  expect(result).toBe('Unknown');
-});
-
-test('should handle mismatched selector and variant key counts', () => {
-  const parser = new MF2Parser('en');
-  const message = `.match {$a} {$b}
-one {{Single key variant}}
-* * {{Double key variant}}`;
-
-  const result = parser.parse(message, { a: 'x', b: 'y' });
-
-  expect(result).toBe('Double key variant');
-});
-
-test('should handle invalid variant lines gracefully', () => {
+test('should return the source and report the error for invalid syntax', () => {
   const parser = new MF2Parser('en');
   const message = `.match {$count :number}
-invalid line without pattern
 one {{One item}}
 *   {{Multiple items}}`;
+  const onError = vi.fn();
 
-  const result = parser.parse(message, { count: 1 });
+  const result = parser.parse(message, { count: 1 }, onError);
 
-  expect(result).toBe('One item');
+  expect(result).toBe(message);
+  expect(onError).toHaveBeenCalledOnce();
+});
+
+test('should reject a match selector without an input declaration', () => {
+  const parser = new MF2Parser('en');
+  const message = `.match $count
+one {{One item}}
+*   {{Multiple items}}`;
+  const onError = vi.fn();
+
+  const result = parser.parse(message, { count: 1 }, onError);
+
+  expect(result).toBe(message);
+  expect(onError).toHaveBeenCalledOnce();
+});
+
+test('should format the same message repeatedly with different values', () => {
+  const parser = new MF2Parser('en');
+
+  expect(parser.parse(PLURAL, { count: 1 })).toBe('You have 1 item');
+  expect(parser.parse(PLURAL, { count: 5 })).toBe('You have 5 items');
+  expect(parser.parse(PLURAL, { count: 1 })).toBe('You have 1 item');
+});
+
+test('should isolate placeholders when bidiIsolation is default', () => {
+  const parser = new MF2Parser('en', { bidiIsolation: 'default' });
+
+  const result = parser.parse('Hello, {$name}!', { name: 'World' });
+
+  expect(result).toBe('Hello, ⁨World⁩!');
 });

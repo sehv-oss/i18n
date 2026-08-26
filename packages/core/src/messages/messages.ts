@@ -1,4 +1,4 @@
-export type Messages = Record<string, string>;
+export type Messages = { [key: string]: string | Messages };
 
 export class MessagesManager {
   private messages = new Map<string, Messages>();
@@ -23,6 +23,21 @@ export class MessagesManager {
     const dictionary = this.get(locale);
     if (!dictionary) return;
 
-    return dictionary[key];
+    const flat = dictionary[key];
+    if (typeof flat === 'string') return flat;
+
+    return this.walk(dictionary, key);
+  }
+
+  private walk(dictionary: Messages, key: string): string | undefined {
+    let current: string | Messages | undefined = dictionary;
+
+    for (const segment of key.split('.')) {
+      if (typeof current !== 'object') return;
+
+      current = current[segment];
+    }
+
+    return typeof current === 'string' ? current : undefined;
   }
 }

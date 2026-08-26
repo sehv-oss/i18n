@@ -1,5 +1,5 @@
 {
-  "typescript.tsdk": "node_modules/typescript/lib",
+  "js/ts.tsdk.path": "node_modules/typescript/lib",
 
   "eslint.options": {
     "overrideConfigFile": ".eslint.config.js"
@@ -7,7 +7,7 @@
   "eslint.workingDirectories": [
     "./packages/core",
     "./packages/react",
-    "./examples"
+    "./site"
   ],
   "eslint.validate": ["javascript", "typescript", "typescriptreact"],
 

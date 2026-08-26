@@ -1,162 +1,71 @@
-import type { IParser } from './parser.interface.ts';
+import { MessageFormat } from 'messageformat';
+import { DraftFunctions } from 'messageformat/functions';
 
-type MF2ParsedMessage = {
-  type: 'simple' | 'match';
-  pattern?: string;
-  selectors?: MF2Selector[];
-  variants?: MF2Variant[];
+import { BoundedCache } from '../caches/bounded.ts';
+import type { IParser, ParseErrorHandler } from './parser.interface.ts';
+
+export type BidiIsolation = 'default' | 'none';
+
+/**
+ * A `MessageFormat` widened over the custom function types contributed by {@link DraftFunctions}, so compiled messages fit a single cache.
+ */
+type CompiledMessage = MessageFormat<string, string>;
+
+export type MF2ParserOptions = {
+  /**
+   * How placeholders with unknown directionality are isolated from the rest of the message.
+   * Defaults to `'none'`, which keeps the formatted output free of the U+2068/U+2069 control characters the spec default inserts.
+   */
+  bidiIsolation?: BidiIsolation;
 };
 
-type MF2Selector = {
-  variable: string;
-  function: string | undefined;
-};
-
-type MF2Variant = {
-  keys: string[];
-  pattern: string;
-};
-
-// TODO: use messageformat npm package
+/**
+ * MessageFormat 2 parser, backed by the reference implementation of the LDML 48 specification.
+ * Compiled messages are cached by their source text, so repeated formatting only pays for the parse once.
+ */
 export class MF2Parser implements IParser {
-  private pluralRules: Intl.PluralRules;
+  private locale: string;
+  private bidiIsolation: BidiIsolation;
+  private compiled = new BoundedCache<CompiledMessage>();
 
-  constructor(locale: string) {
-    this.pluralRules = new Intl.PluralRules(locale);
+  constructor(locale: string, options?: MF2ParserOptions) {
+    this.locale = locale;
+    this.bidiIsolation = options?.bidiIsolation ?? 'none';
   }
 
-  public parse(message: string, values: Record<string, unknown> = {}): string {
-    const trimmed = message.trim();
+  public parse(
+    message: string,
+    values: Record<string, unknown> = {},
+    onError?: ParseErrorHandler
+  ): string {
+    const messageFormat = this.compile(message, onError);
+    if (!messageFormat) return message;
 
-    if (trimmed.startsWith('.match')) {
-      return this.parseMatch(trimmed, values);
-    }
-
-    return this.interpolate(trimmed, values);
+    return messageFormat.format(values, onError ?? silent);
   }
 
-  private parseMatch(message: string, values: Record<string, unknown>): string {
-    const parsed = this.parseMatchSyntax(message);
-    if (!parsed.selectors?.length || !parsed.variants?.length) {
-      return message;
-    }
+  private compile(
+    message: string,
+    onError?: ParseErrorHandler
+  ): CompiledMessage | undefined {
+    const cached = this.compiled.get(message);
+    if (cached) return cached;
 
-    const selectedVariant = this.selectVariant(
-      parsed.selectors,
-      parsed.variants,
-      values
-    );
-
-    return this.interpolate(selectedVariant, values);
-  }
-
-  private parseMatchSyntax(message: string): MF2ParsedMessage {
-    const lines = message
-      .split('\n')
-      .map((line) => line.trim())
-      .filter(Boolean);
-
-    if (lines.length === 0 || !lines[0]?.startsWith('.match')) {
-      return { type: 'simple', pattern: message };
-    }
-
-    const matchLine = lines[0];
-    const selectors = this.parseSelectors(matchLine);
-    const variants = this.parseVariants(lines.slice(1));
-
-    return {
-      type: 'match',
-      selectors,
-      variants,
-    };
-  }
-
-  private parseSelectors(matchLine: string): MF2Selector[] {
-    const selectors: MF2Selector[] = [];
-    const selectorRegex = /\{\s*\$(\w+)(?:\s+:(\w+))?\s*\}/g;
-
-    let match;
-    while ((match = selectorRegex.exec(matchLine)) !== null) {
-      const [, variable, fn] = match;
-      if (!variable) continue;
-
-      selectors.push({
-        variable,
-        function: fn,
+    try {
+      const messageFormat = new MessageFormat(this.locale, message, {
+        bidiIsolation: this.bidiIsolation,
+        functions: DraftFunctions,
       });
+
+      this.compiled.set(message, messageFormat);
+
+      return messageFormat;
+    } catch (error) {
+      onError?.(error);
+
+      return undefined;
     }
-
-    return selectors;
-  }
-
-  private parseVariants(lines: string[]): MF2Variant[] {
-    const variants: MF2Variant[] = [];
-    const variantRegex = /^([\w\s*]+)\s*\{\{(.+?)\}\}$/;
-
-    for (const line of lines) {
-      const match = variantRegex.exec(line);
-      if (!match) continue;
-
-      const [, keys, pattern] = match;
-      if (!keys || !pattern) continue;
-
-      const normalizedKeys = keys.trim().split(/\s+/);
-      const normalizedPattern = pattern.trim();
-      variants.push({ keys: normalizedKeys, pattern: normalizedPattern });
-    }
-
-    return variants;
-  }
-
-  private selectVariant(
-    selectors: MF2Selector[],
-    variants: MF2Variant[],
-    values: Record<string, unknown>
-  ): string {
-    const resolvedKeys = selectors.map((selector) => {
-      const value = values[selector.variable];
-
-      if (selector.function === 'number' && typeof value === 'number') {
-        return this.pluralRules.select(value);
-      }
-
-      return String(value ?? '*');
-    });
-
-    for (const variant of variants) {
-      if (this.matchesVariant(variant.keys, resolvedKeys)) {
-        return variant.pattern;
-      }
-    }
-
-    const fallback = variants.find((variant) =>
-      variant.keys.every((key) => key === '*')
-    );
-
-    return fallback?.pattern ?? '';
-  }
-
-  private matchesVariant(
-    variantKeys: string[],
-    resolvedKeys: string[]
-  ): boolean {
-    if (variantKeys.length !== resolvedKeys.length) return false;
-
-    return variantKeys.every((key, index) => {
-      return key === '*' || key === resolvedKeys[index];
-    });
-  }
-
-  private interpolate(
-    pattern: string,
-    values: Record<string, unknown>
-  ): string {
-    const regex = /\{\s*\$(\w+)\s*\}/g;
-
-    return pattern.replace(regex, (_, key: string) => {
-      const value = values[key];
-
-      return value !== undefined ? String(value) : `{$${key}}`;
-    });
   }
 }
+
+function silent(): void {}

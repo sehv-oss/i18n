@@ -1,20 +1,20 @@
-export class MessageCache {
-  private cache = new Map<string, string>();
+export class BoundedCache<TValue> {
+  private cache = new Map<string, TValue>();
   private maxSize: number;
 
   constructor(maxSize: number = 1000) {
     this.maxSize = maxSize;
   }
 
-  get(key: string): string | undefined {
+  get(key: string): TValue | undefined {
     return this.cache.get(key);
   }
 
-  set(key: string, value: string): void {
+  set(key: string, value: TValue): void {
     if (this.cache.size >= this.maxSize) {
       const firstKey = this.cache.keys().next().value;
 
-      if (firstKey) {
+      if (firstKey !== undefined) {
         this.cache.delete(firstKey);
       }
     }

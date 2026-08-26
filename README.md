@@ -4,12 +4,12 @@ Modern i18n library for JavaScript. Web standards based, runs everywhere.
 
 ## Features
 
-- **Web Standards** — Built on `Intl` API
-- **MessageFormat 2.0** — Modern message syntax
+- **Web Standards** — Built on the `Intl` API
+- **MessageFormat 2.0** — LDML 48 syntax, via the reference implementation
 - **Universal** — Works in browsers, Node.js, Bun, Deno
-- **Type-safe** — Full TypeScript support
+- **Type-safe** — Keys, dot paths and message placeholders checked at compile time
 - **Extensible** — Custom loaders via plugins
-- **Lightweight** — Zero dependencies, tree-shakeable
+- **Lightweight** — One dependency, nothing transitive, tree-shakeable
 
 ## Packages
 

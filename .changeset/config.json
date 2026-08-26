@@ -5,5 +5,5 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["@sehv-oss/i18n-examples"]
+  "ignore": ["@sehv-oss/i18n-site"]
 }

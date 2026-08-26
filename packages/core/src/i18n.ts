@@ -1,4 +1,3 @@
-import { MessageCache } from './caches/message.ts';
 import {
   FormatCurrency,
   type FormatCurrencyOptions,
@@ -13,34 +12,49 @@ import {
 } from './formatters/relative-time.ts';
 import { JsonLoader } from './loaders/json-loader.ts';
 import type { ILoader } from './loaders/loader.interface.ts';
+import type { TranslationKey } from './messages/keys.types.ts';
 import { type Messages, MessagesManager } from './messages/messages.ts';
-import { MF2Parser } from './parsers/mf2-parser.ts';
+import type { TranslateArgs } from './messages/values.types.ts';
+import { type BidiIsolation, MF2Parser } from './parsers/mf2-parser.ts';
+
+export type I18nErrorHandler = (error: unknown, key: string) => void;
 
 export type I18nConfig = {
   locale: string;
   fallbackLocale?: string;
   messages?: Record<string, Messages>;
   loaders?: ILoader[];
+  onError?: I18nErrorHandler;
+  bidiIsolation?: BidiIsolation;
 };
 
 export class I18nInstance {
   private locale: string;
   private fallbackLocale: string | undefined;
   private messagesManager: MessagesManager;
-  private messageCache: MessageCache;
   private loaders: ILoader[];
+  private onError: I18nErrorHandler | undefined;
+  private bidiIsolation: BidiIsolation;
   private mf2ParserByLocale: Map<string, MF2Parser>;
   private localeChangeListeners = new Set<(locale: string) => void>();
 
   constructor(config: I18nConfig) {
-    const { locale, fallbackLocale, loaders, messages } = config;
+    const {
+      locale,
+      fallbackLocale,
+      loaders,
+      messages,
+      onError,
+      bidiIsolation,
+    } = config;
 
     this.locale = locale;
     this.fallbackLocale = fallbackLocale;
     this.messagesManager = new MessagesManager();
-    this.messageCache = new MessageCache();
     this.mf2ParserByLocale = new Map();
     this.loaders = [new JsonLoader(), ...(loaders ?? [])];
+    this.onError = onError;
+    this.bidiIsolation = bidiIsolation ?? 'none';
 
     if (messages) {
       Object.entries(messages).forEach(([locale, messagesLocale]) => {
@@ -55,7 +69,6 @@ export class I18nInstance {
 
   public setLocale(locale: string): void {
     this.locale = locale;
-    this.messageCache.clear();
     this.localeChangeListeners.forEach((listener) => listener(locale));
   }
 
@@ -75,13 +88,10 @@ export class I18nInstance {
     return this.messagesManager.getLocales();
   }
 
-  public translate(key: string, values?: Record<string, unknown>): string {
-    const cacheKey = `${this.locale}:${key}:${JSON.stringify(values ?? {})}`;
-
-    if (this.messageCache.has(cacheKey)) {
-      return this.messageCache.get(cacheKey)!;
-    }
-
+  public translate<TKey extends TranslationKey>(
+    key: TKey,
+    ...values: TranslateArgs<TKey>
+  ): string {
     let message = this.messagesManager.getMessage(this.locale, key);
     if (!message && this.fallbackLocale) {
       message = this.messagesManager.getMessage(this.fallbackLocale, key);
@@ -91,11 +101,10 @@ export class I18nInstance {
       return key;
     }
 
+    const [params] = values as [Record<string, unknown>?];
     const parser = this.getParser(this.locale);
-    const result = parser.parse(message, values);
 
-    this.messageCache.set(cacheKey, result);
-    return result;
+    return parser.parse(message, params, (error) => this.onError?.(error, key));
   }
 
   public formatNumber(value: number, options?: FormatNumberOptions): string {
@@ -138,7 +147,6 @@ export class I18nInstance {
 
   public loadMessages(locale: string, messages: Messages): void {
     this.messagesManager.set(locale, messages);
-    this.messageCache.clear();
   }
 
   public async loadMessagesAsync(url: string): Promise<void> {
@@ -166,7 +174,7 @@ export class I18nInstance {
   private getParser(locale: string): MF2Parser {
     let parser = this.mf2ParserByLocale.get(locale);
     if (!parser) {
-      parser = new MF2Parser(locale);
+      parser = new MF2Parser(locale, { bidiIsolation: this.bidiIsolation });
       this.mf2ParserByLocale.set(locale, parser);
     }
 
@@ -204,3 +212,13 @@ export function createI18n(config: I18nConfig): I18nInstance {
 
 export * from './formatters/formatters.ts';
 export type * from './loaders/loader.interface.ts';
+export type * from './parsers/parser.interface.ts';
+export type { Messages } from './messages/messages.ts';
+export type { Register } from './messages/register.types.ts';
+export type { MessageKey, TranslationKey } from './messages/keys.types.ts';
+export type {
+  MessageParams,
+  TranslateArgs,
+  TranslationValues,
+} from './messages/values.types.ts';
+export type { BidiIsolation } from './parsers/mf2-parser.ts';

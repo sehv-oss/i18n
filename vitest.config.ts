@@ -23,6 +23,35 @@ export default defineConfig({
           name: 'core',
           environment: 'node',
           include: ['packages/core/tests/**/*.test.ts'],
+          typecheck: {
+            enabled: true,
+            tsconfig: './packages/core/tsconfig.tests.json',
+            include: ['packages/core/tests/**/*.test-d.ts'],
+          },
+        },
+      }),
+      defineProject({
+        test: {
+          name: 'core-types',
+          include: [],
+          typecheck: {
+            enabled: true,
+            only: true,
+            tsconfig: './packages/core/tests/types-augmented/tsconfig.json',
+            include: ['packages/core/tests/types-augmented/**/*.test-d.ts'],
+          },
+        },
+      }),
+      defineProject({
+        test: {
+          name: 'react-types',
+          include: [],
+          typecheck: {
+            enabled: true,
+            only: true,
+            tsconfig: './packages/react/tests/types-augmented/tsconfig.json',
+            include: ['packages/react/tests/types-augmented/**/*.test-d.tsx'],
+          },
         },
       }),
       defineProject({

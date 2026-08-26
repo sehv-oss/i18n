@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { CoreExample } from './components/core-example.tsx';
 import { InstallTabs } from './components/install-tabs.tsx';
 import { ReactExample } from './components/react-example.tsx';
+import { TypeSafeExample } from './components/type-safe-example.tsx';
 import { YamlExample } from './components/yaml-example.tsx';
 
 const NAV_ITEMS = [
   { id: 'core', label: 'Core' },
+  { id: 'typesafe', label: 'Type-safe' },
   { id: 'react', label: 'React' },
   { id: 'yaml', label: 'Custom Loaders' },
 ];
@@ -24,7 +26,7 @@ export function App() {
               <span className="text-white">i18n</span>
             </span>
             <span className="hidden sm:inline-block px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider bg-zinc-800 text-zinc-400 border border-zinc-700">
-              examples
+              site
             </span>
           </div>
 
@@ -123,15 +125,16 @@ export function App() {
 
           <p className="text-base sm:text-lg md:text-xl text-zinc-400 max-w-2xl mx-auto mb-8 sm:mb-10 px-2">
             Lightweight, type-safe internationalization powered by the Intl API
-            and MessageFormat 2.0. Zero dependencies, works everywhere.
+            and MessageFormat 2.0. One dependency, nothing transitive, works
+            everywhere.
           </p>
 
           <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-10 sm:mb-16 px-2">
             {[
               'MessageFormat 2.0',
-              'Zero Dependencies',
+              'Zero Transitive Deps',
               'Tree-shakeable',
-              'Type-safe',
+              'Typed Keys',
               'Custom Loaders',
               'SSR Ready',
             ].map((feature) => (
@@ -151,7 +154,7 @@ export function App() {
             </div>
             <div className="flex flex-col items-center gap-1">
               <span className="text-2xl font-bold text-white">0</span>
-              <span>Dependencies</span>
+              <span>Transitive Deps</span>
             </div>
             <div className="flex flex-col items-center gap-1">
               <span className="text-2xl font-bold text-white">∞</span>
@@ -164,6 +167,7 @@ export function App() {
 
         <div className="space-y-16 sm:space-y-24 pb-16 sm:pb-24">
           <CoreExample />
+          <TypeSafeExample />
           <ReactExample />
           <YamlExample />
         </div>

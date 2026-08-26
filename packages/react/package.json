@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "tsdown",
+    "typecheck:types": "tsc --project tests/types-augmented/tsconfig.json",
     "lint:eslint": "eslint ."
   },
   "files": [
@@ -34,9 +35,9 @@
     "url": "https://github.com/sehv-oss/i18n/issues"
   },
   "engines": {
-    "node": ">=22 <27"
+    "node": ">=24 <27"
   },
-  "peerDependencies": {
+  "dependencies": {
     "@sehv-oss/i18n": "workspace:*",
     "react": "catalog:"
   },

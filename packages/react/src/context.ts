@@ -3,6 +3,7 @@ import type { I18nInstance } from '@sehv-oss/i18n';
 
 export type I18nContextValue = {
   i18n: I18nInstance;
+  locale: string;
 };
 
 export const I18nContext = React.createContext<I18nContextValue | null>(null);
