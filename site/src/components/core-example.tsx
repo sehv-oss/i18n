@@ -11,15 +11,17 @@ const i18n = createI18n({
   messages: {
     en: {
       greeting: 'Hello, {$name}!',
-      items: `.match {$count :number}
+      items: `.input {$count :number}
+.match $count
 one {{You have {$count} item}}
 *   {{You have {$count} items}}`,
     },
     pt: {
       greeting: 'Olá, {$name}!',
-      items: `.match {$count :number}
+      items: `.input {$count :number}
+.match $count
 one {{Você tem {$count} item}}
-*   {{Você tem {$count} items}}`,
+*   {{Você tem {$count} itens}}`,
     },
   },
 });
@@ -33,15 +35,17 @@ const i18n = createI18n({
   messages: {
     en: {
       greeting: 'Hello, {$name}!',
-      items: \`.match {$count :number}
+      items: \`.input {$count :number}
+.match $count
 one {{You have {$count} item}}
 *   {{You have {$count} items}}\`,
     },
     pt: {
       greeting: 'Olá, {$name}!',
-      items: \`.match {$count :number}
+      items: \`.input {$count :number}
+.match $count
 one {{Você tem {$count} item}}
-*   {{Você tem {$count} items}}\`,
+*   {{Você tem {$count} itens}}\`,
     },
   },
 });
@@ -114,7 +118,7 @@ export function CoreExample(): React.ReactElement {
       id="core"
       badge="Universal"
       title="Core — Any Runtime"
-      description="Built on Web Standards (Intl API + MessageFormat 2.0). Works in browsers, Node.js, Bun, and Deno with zero dependencies."
+      description="Built on Web Standards (Intl API + MessageFormat 2.0). Works in browsers, Node.js, Bun, and Deno, with a single dependency and nothing transitive."
     >
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <CodeBlock code={CODE} filename="example.ts" lang="typescript" />

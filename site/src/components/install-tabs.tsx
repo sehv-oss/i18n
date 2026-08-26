@@ -20,9 +20,9 @@ const PACKAGES = [
     name: '@sehv-oss/i18n-react',
     description: 'React bindings',
     commands: {
-      npm: 'npm install @sehv-oss/i18n @sehv-oss/i18n-react',
-      pnpm: 'pnpm add @sehv-oss/i18n @sehv-oss/i18n-react',
-      yarn: 'yarn add @sehv-oss/i18n @sehv-oss/i18n-react',
+      npm: 'npm install @sehv-oss/i18n-react',
+      pnpm: 'pnpm add @sehv-oss/i18n-react',
+      yarn: 'yarn add @sehv-oss/i18n-react',
     },
   },
 ];

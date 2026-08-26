@@ -31,13 +31,14 @@ farewell: "Goodbye, {$name}!"
 notifications:
   new_message: "You have a new message from {$sender}"
 items: |
-  .match {$count :number}
+  .input {$count :number}
+  .match $count
   one {{You have {$count} item}}
   *   {{You have {$count} items}}
 `;
 
 const CUSTOM_LOADER_CODE = `
-import { type ILoader } from '@sehv-oss/i18n';
+import { type ILoader, type Messages } from '@sehv-oss/i18n';
 import { parse } from 'csv-parse/sync';
 
 // Any format — just implement ILoader
@@ -48,7 +49,7 @@ const csvLoader: ILoader = {
       columns: true,
       skip_empty_lines: true,
     });
-    const messages: Record<string, string> = {};
+    const messages: Messages = {};
     for (const record of records) {
       messages[record.key] = record.value;
     }
@@ -63,7 +64,7 @@ export function YamlExample(): React.ReactElement {
       id="yaml"
       badge="Extensible"
       title="Custom Loaders"
-      description="Extend @sehv-oss/i18n with custom loaders for any format. YAML, CSV, TOML — you name it."
+      description="Extend @sehv-oss/i18n with custom loaders for any format. YAML, CSV, TOML — you name it. Nested messages are read back by dot path, so notifications.new_message just works."
     >
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <div className="space-y-6">

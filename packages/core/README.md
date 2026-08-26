@@ -28,7 +28,8 @@ const i18n = createI18n({
   messages: {
     en: {
       greeting: 'Hello, {$name}!',
-      items: `.match {$count :number}
+      items: `.input {$count :number}
+.match $count
 one {{You have {$count} item}}
 *   {{You have {$count} items}}`,
     },
@@ -41,6 +42,72 @@ i18n.translate('greeting', { name: 'World' });
 i18n.translate('items', { count: 5 });
 // → "You have 5 items"
 ```
+
+Messages follow the [LDML 48 MessageFormat](https://www.unicode.org/reports/tr35/tr35-76/tr35-messageFormat.html) syntax. A `.match` selector must be annotated by a preceding `.input` or `.local` declaration — `.match $count` on its own is rejected.
+
+### Nested messages
+
+Messages can be nested, and are read back by dot path:
+
+```typescript
+const i18n = createI18n({
+  locale: 'en',
+  messages: {
+    en: {
+      home: {
+        title: 'Home',
+        nav: { back: 'Back' },
+      },
+    },
+  },
+});
+
+i18n.translate('home.nav.back');
+// → "Back"
+```
+
+A flat key that literally contains dots still wins over the nested path, so existing dictionaries keep working unchanged.
+
+### Type-safe keys
+
+Augment `Register` once and every key, dot path and placeholder is checked by the compiler — in this package and in `@sehv-oss/i18n-react` alike:
+
+```typescript
+// locales/en.ts
+export default {
+  greeting: 'Hello, {$name}!',
+  home: { title: 'Home' },
+} as const;
+```
+
+```typescript
+// i18n.d.ts
+import type en from './locales/en.ts';
+
+declare module '@sehv-oss/i18n' {
+  interface Register {
+    messages: typeof en;
+  }
+}
+```
+
+```typescript
+i18n.translate('home.title'); // ok
+i18n.translate('greeting', { name: 'World' }); // ok
+
+i18n.translate('greetng', { name: 'World' }); // error: unknown key
+i18n.translate('home.subtitle'); // error: unknown path
+i18n.translate('home'); // error: a group, not a message
+i18n.translate('greeting'); // error: the message declares $name
+i18n.translate('greeting', {}); // error: 'name' is missing
+```
+
+Without the augmentation nothing breaks — keys fall back to `string` and `values` to `Record<string, unknown>`.
+
+Two things worth knowing:
+
+- `typeof import('./en.json')` gives you checked **keys**, but TypeScript widens JSON string values to `string`, so **placeholder** checking needs a `.ts` module with `as const`.
+- Placeholders are read from the message text: `{$count :number}` asks for `count` and `{$user.name}` asks for `user`. Names bound by `.local` are left out, since they never reach the caller.
 
 ### Formatters
 
@@ -93,6 +160,15 @@ await i18n.loadMessagesAsync('/locales/en.yaml');
 ### `createI18n(config)`
 
 Creates an i18n instance.
+
+| Option           | Description                                                                                               |
+| ---------------- | --------------------------------------------------------------------------------------------------------- |
+| `locale`         | Current locale                                                                                            |
+| `fallbackLocale` | Locale to read from when a key is missing                                                                 |
+| `messages`       | Messages per locale, flat or nested                                                                       |
+| `loaders`        | Extra loaders for `loadMessagesAsync`                                                                     |
+| `onError`        | `(error, key) => void`, called on parse or resolution failures. Silent when omitted                       |
+| `bidiIsolation`  | `'none'` (default) or `'default'`, which wraps placeholders in the U+2068/U+2069 characters the spec adds |
 
 ### Methods
 

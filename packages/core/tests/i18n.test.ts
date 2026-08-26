@@ -67,7 +67,7 @@ test('should translate a simple key', () => {
   expect(result).toBe('Simple message');
 });
 
-test('should return cached translation on second call', () => {
+test('should return the same translation on repeated calls', () => {
   const i18n = createI18n({
     locale: 'en',
     messages: {
@@ -265,4 +265,79 @@ test('should format relative time', () => {
   const result = i18n.formatRelativeTime(-2, 'days');
 
   expect(result).toBe('2 days ago');
+});
+
+test('should translate a nested key by dot path', () => {
+  const i18n = createI18n({
+    locale: 'en',
+    messages: {
+      en: {
+        home: { title: 'Home', nav: { back: 'Back' } },
+      },
+    },
+  });
+
+  expect(i18n.translate('home.title')).toBe('Home');
+  expect(i18n.translate('home.nav.back')).toBe('Back');
+});
+
+test('should pluralize through MessageFormat 2', () => {
+  const i18n = createI18n({
+    locale: 'en',
+    messages: {
+      en: {
+        items: `.input {$count :number}
+.match $count
+one {{You have {$count} item}}
+*   {{You have {$count} items}}`,
+      },
+    },
+  });
+
+  expect(i18n.translate('items', { count: 1 })).toBe('You have 1 item');
+  expect(i18n.translate('items', { count: 5 })).toBe('You have 5 items');
+});
+
+test('should re-translate after a locale change', () => {
+  const i18n = createI18n({
+    locale: 'en',
+    messages: {
+      en: { greeting: 'Hello, {$name}!' },
+      pt: { greeting: 'Olá, {$name}!' },
+    },
+  });
+
+  const before = i18n.translate('greeting', { name: 'World' });
+  i18n.setLocale('pt');
+  const after = i18n.translate('greeting', { name: 'World' });
+
+  expect(before).toBe('Hello, World!');
+  expect(after).toBe('Olá, World!');
+});
+
+test('should report formatting errors through the configured handler', () => {
+  const onError = vi.fn();
+  const i18n = createI18n({
+    locale: 'en',
+    messages: { en: { greeting: 'Hello, {$name}!' } },
+    onError,
+  });
+
+  const result = i18n.translate('greeting');
+
+  expect(result).toBe('Hello, {$name}!');
+  expect(onError).toHaveBeenCalledOnce();
+  expect(onError.mock.calls[0]?.[1]).toBe('greeting');
+});
+
+test('should isolate placeholders when bidiIsolation is default', () => {
+  const i18n = createI18n({
+    locale: 'en',
+    messages: { en: { greeting: 'Hello, {$name}!' } },
+    bidiIsolation: 'default',
+  });
+
+  const result = i18n.translate('greeting', { name: 'World' });
+
+  expect(result).toBe('Hello, ⁨World⁩!');
 });

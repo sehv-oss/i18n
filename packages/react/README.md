@@ -97,6 +97,36 @@ function MyComponent() {
 }
 ```
 
+### Type-safe keys
+
+Augment `Register` once — in the core package — and the hooks and components pick it up on their own. There is no generic to thread, no factory to call and nothing extra to pass to the provider:
+
+```typescript
+// i18n.d.ts
+import type en from './locales/en.ts';
+
+declare module '@sehv-oss/i18n' {
+  interface Register {
+    messages: typeof en;
+  }
+}
+```
+
+```tsx
+const translate = useTranslate();
+
+translate('home.title'); // ok
+translate('greeting', { name: 'World' }); // ok
+translate('greetng', { name: 'World' }); // error: unknown key
+translate('greeting'); // error: the message declares $name
+
+<Translate id="home.title" />; // ok
+<Translate id="greeting" values={{ name: 'World' }} />; // ok
+<Translate id="greeting" />; // error: values is required
+```
+
+See the [core README](../core/README.md#type-safe-keys) for how the message shape is declared.
+
 ## API
 
 ### Provider

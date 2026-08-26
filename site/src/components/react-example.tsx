@@ -215,7 +215,7 @@ export function ReactExample(): React.ReactElement {
       id="react"
       badge="React"
       title="React Bindings"
-      description="First-class React support with hooks and declarative components. Auto re-renders on locale change."
+      description="First-class React support with hooks and declarative components. Auto re-renders on locale change, and every key stays typed — no generic on the hook, no factory, nothing threaded through the provider."
     >
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <div className="space-y-6">

@@ -45,3 +45,30 @@ test('should throw on invalid values', () => {
     'Invalid messages format!'
   );
 });
+
+test('should parse nested JSON', () => {
+  const loader = new JsonLoader();
+
+  const content = '{"home": {"title": "Home", "nav": {"back": "Back"}}}';
+  const result = loader.parse(content);
+
+  expect(result).toEqual({
+    home: { title: 'Home', nav: { back: 'Back' } },
+  });
+});
+
+test('should throw on invalid nested values', () => {
+  const loader = new JsonLoader();
+
+  expect(() => loader.parse('{"home": {"title": 123}}')).toThrow(
+    'Invalid messages format!'
+  );
+});
+
+test('should throw on nested arrays', () => {
+  const loader = new JsonLoader();
+
+  expect(() => loader.parse('{"home": ["a"]}')).toThrow(
+    'Invalid messages format!'
+  );
+});

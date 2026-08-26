@@ -66,3 +66,46 @@ test('should return undefined for non-existent locale when getting message', () 
 
   expect(nonexistent).toBeUndefined();
 });
+
+test('should get a nested message by dot path', () => {
+  const manager = new MessagesManager();
+
+  manager.set('en', {
+    home: { title: 'Home', nav: { back: 'Back' } },
+  });
+  const title = manager.getMessage('en', 'home.title');
+  const back = manager.getMessage('en', 'home.nav.back');
+
+  expect(title).toBe('Home');
+  expect(back).toBe('Back');
+});
+
+test('should prefer a flat key containing dots over the nested path', () => {
+  const manager = new MessagesManager();
+
+  manager.set('en', {
+    'home.title': 'Flat',
+    home: { title: 'Nested' },
+  });
+  const title = manager.getMessage('en', 'home.title');
+
+  expect(title).toBe('Flat');
+});
+
+test('should return undefined when a dot path resolves to an object', () => {
+  const manager = new MessagesManager();
+
+  manager.set('en', { home: { title: 'Home' } });
+  const home = manager.getMessage('en', 'home');
+
+  expect(home).toBeUndefined();
+});
+
+test('should return undefined when a dot path segment is missing', () => {
+  const manager = new MessagesManager();
+
+  manager.set('en', { home: { title: 'Home' } });
+  const missing = manager.getMessage('en', 'home.missing.deep');
+
+  expect(missing).toBeUndefined();
+});

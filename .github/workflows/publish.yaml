@@ -31,5 +31,5 @@ jobs:
     uses: sehv-oss/actions/.github/workflows/deploy-pages-node-pnpm.yaml@main
     with:
       build-command: pnpm build
-      output-path: ./examples/dist/
+      output-path: ./site/dist/
     secrets: inherit
