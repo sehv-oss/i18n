@@ -13,9 +13,9 @@
     "test:coverage": "vitest --coverage",
     "clean": "git clean -fdX",
     "lint": "pnpm lint:cspell && pnpm lint:prettier && pnpm lint:eslint",
-    "lint:cspell": "cspell . --config .cspell.config.js",
+    "lint:cspell": "cspell . --config .cspell.config.ts",
     "lint:eslint": "echo \"pnpm --recursive lint:eslint\"",
-    "lint:prettier": "prettier --config .prettier.config.js --check .",
+    "lint:prettier": "prettier --config .prettier.config.ts --check .",
     "site:dev": "pnpm --filter @sehv-oss/i18n-site dev"
   },
   "devDependencies": {
