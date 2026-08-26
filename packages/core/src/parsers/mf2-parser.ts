@@ -4,6 +4,12 @@ import { DraftFunctions } from 'messageformat/functions';
 import { BoundedCache } from '../caches/bounded.ts';
 import type { IParser, ParseErrorHandler } from './parser.interface.ts';
 
+/**
+ * How placeholders with unknown directionality are isolated from the rest of the message.
+ *
+ * - `'none'` — no isolation, the output carries only visible characters.
+ * - `'default'` — the spec behavior, wrapping placeholders in the U+2068 and U+2069 control characters so mixed-direction text renders correctly.
+ */
 export type BidiIsolation = 'default' | 'none';
 
 /**
@@ -33,6 +39,12 @@ export class MF2Parser implements IParser {
     this.bidiIsolation = options?.bidiIsolation ?? 'none';
   }
 
+  /**
+   * Formats `message` against `values`.
+   *
+   * A message that fails to compile is returned as its own source text, and a value that fails to format falls back to its own representation, so the call always produces something to render.
+   * Both paths report through `onError` first.
+   */
   public parse(
     message: string,
     values: Record<string, unknown> = {},
