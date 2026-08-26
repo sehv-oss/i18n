@@ -1,3 +1,11 @@
+/**
+ * Components that render a translated or formatted string.
+ *
+ * Each one returns a bare string, no wrapper element, so it drops into text without disturbing the surrounding markup or CSS.
+ *
+ * @packageDocumentation
+ */
+
 export * from './format-currency.ts';
 export * from './format-date.ts';
 export * from './format-list.ts';

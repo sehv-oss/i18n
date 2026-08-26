@@ -1,3 +1,12 @@
+/**
+ * Modern i18n for JavaScript, built on the `Intl` API and MessageFormat 2.
+ *
+ * {@link createI18n} is the entry point. It returns an {@link I18nInstance} that stores messages, translates them and formats numbers, dates, lists and relative times.
+ * {@link Register} is the one-time augmentation that makes keys and message placeholders statically checked.
+ *
+ * @packageDocumentation
+ */
+
 import {
   FormatCurrency,
   type FormatCurrencyOptions,
@@ -17,17 +26,73 @@ import { type Messages, MessagesManager } from './messages/messages.ts';
 import type { TranslateArgs } from './messages/values.types.ts';
 import { type BidiIsolation, MF2Parser } from './parsers/mf2-parser.ts';
 
+/**
+ * Called when a message fails to compile or format.
+ *
+ * Failures are reported, never thrown:
+ * {@link I18nInstance.translate} always returns a string, so a broken message degrades to readable output instead of taking the surrounding render down with it.
+ *
+ * @param error - The failure raised while compiling or formatting.
+ * @param key - The translation key being resolved when it happened.
+ */
 export type I18nErrorHandler = (error: unknown, key: string) => void;
 
+/**
+ * Configuration accepted by {@link createI18n}.
+ */
 export type I18nConfig = {
+  /**
+   * Locale used for message lookup and for every formatter, as a BCP 47 tag such as `'en'` or `'pt-BR'`.
+   */
   locale: string;
+
+  /**
+   * Locale to read from when a key is missing in {@link I18nConfig.locale}.
+   *
+   * Only the message text comes from the fallback — it is still formatted with the current locale, so numbers and plurals follow what the reader sees.
+   */
   fallbackLocale?: string;
+
+  /**
+   * Messages per locale, flat or nested. Equivalent to calling {@link I18nInstance.loadMessages} once per entry.
+   */
   messages?: Record<string, Messages>;
+
+  /**
+   * Extra loaders for {@link I18nInstance.loadMessagesAsync}, matched by file extension.
+   *
+   * The built-in JSON loader is always installed ahead of these, so `.json` stays handled and cannot be taken over by a custom loader.
+   */
   loaders?: ILoader[];
+
+  /**
+   * Called on compile or format failures. Silent when omitted.
+   */
   onError?: I18nErrorHandler;
+
+  /**
+   * How placeholders with unknown directionality are isolated from the rest of the message.
+   *
+   * Defaults to `'none'`, which keeps the formatted output free of the U+2068/U+2069 control characters the spec default inserts.
+   */
   bidiIsolation?: BidiIsolation;
 };
 
+/**
+ * A configured i18n instance: message storage, translation and the `Intl` formatters, all bound to one current locale.
+ *
+ * Prefer {@link createI18n} over calling the constructor directly.
+ *
+ * @example
+ * ```ts
+ * const i18n = createI18n({
+ *   locale: 'en',
+ *   messages: { en: { greeting: 'Hello, {$name}!' } },
+ * });
+ *
+ * i18n.translate('greeting', { name: 'World' }); // "Hello, World!"
+ * ```
+ */
 export class I18nInstance {
   private locale: string;
   private fallbackLocale: string | undefined;
@@ -63,15 +128,28 @@ export class I18nInstance {
     }
   }
 
+  /**
+   * The locale currently used for lookup and formatting.
+   */
   public getLocale(): string {
     return this.locale;
   }
 
+  /**
+   * Switches the current locale and notifies every {@link I18nInstance.onLocaleChange} listener.
+   *
+   * Messages already loaded for the new locale are used as they are; nothing is fetched, so load them first when they are not bundled.
+   */
   public setLocale(locale: string): void {
     this.locale = locale;
     this.localeChangeListeners.forEach((listener) => listener(locale));
   }
 
+  /**
+   * Subscribes to locale changes. This is what React bindings use to re-render on {@link I18nInstance.setLocale}.
+   *
+   * @returns An unsubscribe function. Call it to drop the listener.
+   */
   public onLocaleChange(listener: (locale: string) => void): () => void {
     this.localeChangeListeners.add(listener);
 
@@ -80,14 +158,43 @@ export class I18nInstance {
     };
   }
 
+  /**
+   * The locale read from when a key is missing, or `undefined` when none was configured.
+   */
   public getFallbackLocale(): string | undefined {
     return this.fallbackLocale;
   }
 
+  /**
+   * Every locale that has messages loaded, in insertion order.
+   *
+   * The current locale is only listed once messages exist for it.
+   */
   public getLocales(): string[] {
     return this.messagesManager.getLocales();
   }
 
+  /**
+   * Formats the message at `key` for the current locale.
+   *
+   * Lookup walks dot-separated segments, except that a flat key containing literal dots wins over the nested path.
+   * Existing dictionaries keep working unchanged. When the key resolves in neither the current locale nor {@link I18nConfig.fallbackLocale},
+   * the key itself is returned, so a missing translation shows up without being fatal.
+   *
+   * `values` is required exactly when the message declares placeholders, and optional otherwise.
+   * That check only exists once {@link Register} has been augmented; without it, keys stay `string` and `values` stays optional.
+   *
+   * @param key - Dot path of the message.
+   * @param values - Placeholder values the message reads, such as `$name` for `{$name}`.
+   * @returns The formatted message, or `key` when no message was found.
+   *
+   * @example
+   * ```ts
+   * i18n.translate('home.title'); // "Home"
+   * i18n.translate('greeting', { name: 'World' }); // "Hello, World!"
+   * i18n.translate('unknown.key'); // "unknown.key"
+   * ```
+   */
   public translate<TKey extends TranslationKey>(
     key: TKey,
     ...values: TranslateArgs<TKey>
@@ -107,12 +214,34 @@ export class I18nInstance {
     return parser.parse(message, params, (error) => this.onError?.(error, key));
   }
 
+  /**
+   * Formats a number with `Intl.NumberFormat`.
+   *
+   * @param options - `Intl.NumberFormatOptions`, plus a `locale` that overrides the current one for this call.
+   *
+   * @example
+   * ```ts
+   * i18n.formatNumber(1234.56); // "1,234.56"
+   * i18n.formatNumber(0.42, { style: 'percent' }); // "42%"
+   * ```
+   */
   public formatNumber(value: number, options?: FormatNumberOptions): string {
     const locale = options?.locale ?? this.locale;
 
     return FormatNumber.format(value, locale, options);
   }
 
+  /**
+   * Formats a currency amount with `Intl.NumberFormat`.
+   *
+   * @param currency - ISO 4217 code, such as `'USD'` or `'BRL'`.
+   * @param options - `Intl.NumberFormatOptions` without `style`, which is fixed to `'currency'`, plus a `locale` that overrides the current one.
+   *
+   * @example
+   * ```ts
+   * i18n.formatCurrency(99.9, 'USD'); // "$99.90"
+   * ```
+   */
   public formatCurrency(
     value: number,
     currency: string,
@@ -123,18 +252,53 @@ export class I18nInstance {
     return FormatCurrency.format(value, currency, locale, options);
   }
 
+  /**
+   * Formats a date with `Intl.DateTimeFormat`.
+   *
+   * @param value - A `Date`, or a timestamp in milliseconds.
+   * @param options - `Intl.DateTimeFormatOptions`, plus a `locale` that overrides the current one for this call.
+   *
+   * @example
+   * ```ts
+   * i18n.formatDate(new Date(), { dateStyle: 'long' }); // "January 27, 2026"
+   * ```
+   */
   public formatDate(value: Date | number, options?: FormatDateOptions): string {
     const locale = options?.locale ?? this.locale;
 
     return FormatDate.format(value, locale, options);
   }
 
+  /**
+   * Joins values into a locale-aware list with `Intl.ListFormat`.
+   *
+   * @param options - `Intl.ListFormatOptions`, plus a `locale` that overrides the current one for this call.
+   *
+   * @example
+   * ```ts
+   * i18n.formatList(['apple', 'banana', 'orange']);
+   * // "apple, banana, and orange"
+   * ```
+   */
   public formatList(values: string[], options?: FormatListOptions): string {
     const locale = options?.locale ?? this.locale;
 
     return FormatList.format(values, locale, options);
   }
 
+  /**
+   * Formats a relative time with `Intl.RelativeTimeFormat`.
+   *
+   * @param value - Offset from now. Negative points to the past.
+   * @param unit - Singular or plural, both accepted: `'day'` and `'days'` mean the same thing.
+   * @param options - `Intl.RelativeTimeFormatOptions`, plus a `locale` that overrides the current one for this call.
+   *
+   * @example
+   * ```ts
+   * i18n.formatRelativeTime(-2, 'days'); // "2 days ago"
+   * i18n.formatRelativeTime(1, 'hour'); // "in 1 hour"
+   * ```
+   */
   public formatRelativeTime(
     value: number,
     unit: FormatRelativeTimeUnit,
@@ -145,10 +309,34 @@ export class I18nInstance {
     return FormatRelativeTime.format(value, unit, locale, options);
   }
 
+  /**
+   * Registers messages for a locale, replacing whatever was stored for it.
+   *
+   * @param messages - Flat or nested, read back by dot path.
+   *
+   * @example
+   * ```ts
+   * i18n.loadMessages('pt-BR', { greeting: 'Olá, {$name}!' });
+   * ```
+   */
   public loadMessages(locale: string, messages: Messages): void {
     this.messagesManager.set(locale, messages);
   }
 
+  /**
+   * Fetches a message file and registers it, picking the loader by file extension.
+   *
+   * The locale comes from the file name: `/locales/pt-BR.json` loads into `pt-BR`.
+   * A name that is not a valid locale tag falls back to the current locale.
+   *
+   * @param url - Anything `fetch` accepts, with an extension a loader claims.
+   * @throws If the response is not ok, or if no loader handles the extension. The loader itself may also throw on malformed content.
+   *
+   * @example
+   * ```ts
+   * await i18n.loadMessagesAsync('/locales/en.json');
+   * ```
+   */
   public async loadMessagesAsync(url: string): Promise<void> {
     const response = await fetch(url);
 
@@ -206,6 +394,30 @@ export class I18nInstance {
   }
 }
 
+/**
+ * Creates an {@link I18nInstance}.
+ *
+ * The instance is plain state — create one per application and share it, or one per request on the server, whichever suits the runtime.
+ *
+ * @example
+ * ```ts
+ * import { createI18n } from '@sehv-oss/i18n';
+ *
+ * const i18n = createI18n({
+ *   locale: 'en',
+ *   fallbackLocale: 'en',
+ *   messages: {
+ *     en: {
+ *       greeting: 'Hello, {$name}!',
+ *       home: { title: 'Home' },
+ *     },
+ *   },
+ * });
+ *
+ * i18n.translate('greeting', { name: 'World' }); // "Hello, World!"
+ * i18n.translate('home.title'); // "Home"
+ * ```
+ */
 export function createI18n(config: I18nConfig): I18nInstance {
   return new I18nInstance(config);
 }

@@ -1,5 +1,27 @@
+/**
+ * A locale's messages: MessageFormat 2 source strings, flat or nested to any depth.
+ *
+ * Nested groups are read back by dot path, so `{ home: { title: 'Home' } }` is reached as `'home.title'`.
+ * A flat key that literally contains dots still wins over the nested path, which keeps existing dictionaries working unchanged.
+ *
+ * @example
+ * ```ts
+ * const messages: Messages = {
+ *   greeting: 'Hello, {$name}!',
+ *   home: {
+ *     title: 'Home',
+ *     nav: { back: 'Back' },
+ *   },
+ * };
+ * ```
+ */
 export type Messages = { [key: string]: string | Messages };
 
+/**
+ * Stores messages per locale and resolves keys against them.
+ *
+ * @internal
+ */
 export class MessagesManager {
   private messages = new Map<string, Messages>();
 
@@ -19,6 +41,9 @@ export class MessagesManager {
     return Array.from(this.messages.keys());
   }
 
+  /**
+   * Resolves `key` for `locale`, preferring a flat key over the nested path.
+   */
   public getMessage(locale: string, key: string): string | undefined {
     const dictionary = this.get(locale);
     if (!dictionary) return;
