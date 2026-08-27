@@ -140,6 +140,27 @@ Two things worth knowing:
 - `typeof import('./en.json')` gives you checked **keys**, but TypeScript widens JSON string values to `string`, so **placeholder** checking needs a `.ts` module with `as const`.
 - Placeholders are read from the message text: `{$count :number}` asks for `count` and `{$user.name}` asks for `user`. Names bound by `.local` are left out, since they never reach the caller.
 
+### Validating the other locales
+
+`Register` checks the locale you register. `validateMessages` checks the rest of them against it:
+
+```typescript
+import { validateMessages } from '@sehv-oss/i18n';
+import en from './locales/en.ts';
+import ptBR from './locales/pt-BR.ts';
+
+validateMessages(en, ptBR);
+// {
+//   missing: ['checkout.total'],           // not translated yet
+//   extra: ['checkout.oldKey'],            // left over after a rename
+//   mismatched: [                          // the translation dropped a placeholder
+//     { key: 'greeting', expected: ['name'], actual: [] },
+//   ],
+// }
+```
+
+Run it in a test and a dropped placeholder fails the build rather than rendering wrong.
+
 ### Formatters
 
 ```typescript
@@ -294,6 +315,19 @@ Creates an i18n instance.
 | `getLocaleChain()`                          | Get the resolution order                    |
 | `getFallbackLocales()`                      | Get every fallback locale                   |
 | `onLocaleChange(listener)`                  | Subscribe to locale changes                 |
+
+### Utilities
+
+Standalone functions, exported from the package root.
+
+| Function                              | Description                                       |
+| ------------------------------------- | ------------------------------------------------- |
+| `validateMessages(reference, target)` | Compare a locale against a reference locale       |
+| `extractPlaceholders(source)`         | The placeholder names a message reads             |
+| `resolveLocale(requested, available)` | Pick the best available locale for a request      |
+| `expandLocale(locale)`                | A tag and every parent, most specific first       |
+| `getTextDirection(locale)`            | `'ltr'` or `'rtl'` for a locale                   |
+| `clearFormatterCaches()`              | Empty every `Intl` formatter cache in the package |
 
 ## License
 
