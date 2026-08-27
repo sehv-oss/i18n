@@ -17,7 +17,7 @@
       "import": "./dist/i18n.mjs"
     },
     "./formatters": {
-      "types": "./dist/formatters/formatters.d.ts",
+      "types": "./dist/formatters/formatters.d.mts",
       "import": "./dist/formatters/formatters.mjs"
     }
   },
