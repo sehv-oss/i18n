@@ -200,6 +200,25 @@ const i18n = createI18n({
 await i18n.loadMessagesAsync('en', '/locales/en.yaml');
 ```
 
+### Markup placeholders
+
+A message can carry markup placeholders, and `translateToParts` returns them as parts instead of one flat string:
+
+```typescript
+const i18n = createI18n({
+  locale: 'en',
+  messages: { en: { terms: 'Accept the {#link}terms{/link}' } },
+});
+
+i18n.translateToParts('terms');
+// [{ type: 'text', value: 'Accept the ' },
+//  { type: 'markup', kind: 'open', name: 'link' },
+//  { type: 'text', value: 'terms' },
+//  { type: 'markup', kind: 'close', name: 'link' }]
+```
+
+Pair `'open'` and `'close'` parts by `name` to render them. In React, `@sehv-oss/i18n-react` does it for you through `useRichTranslate` and the `tags` prop of `<Translate>`.
+
 ### Custom Functions
 
 Register MF2 function handlers and call them from messages:
