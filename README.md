@@ -8,7 +8,9 @@ Modern i18n library for JavaScript. Web standards based, runs everywhere.
 - **MessageFormat 2.0** — LDML 48 syntax, via the reference implementation
 - **Universal** — Works in browsers, Node.js, Bun, Deno
 - **Type-safe** — Keys, dot paths and message placeholders checked at compile time
-- **Extensible** — Custom loaders via plugins
+- **Rich text** — Links and elements inside a message, not split across three keys
+- **Locale negotiation** — `pt-BR` reads from `pt`, and `Accept-Language` resolves to what you loaded
+- **Extensible** — Custom loaders, custom MF2 functions, or your own parser
 - **Lightweight** — One dependency, nothing transitive, tree-shakeable
 
 ## Packages

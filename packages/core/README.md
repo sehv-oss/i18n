@@ -329,6 +329,16 @@ Standalone functions, exported from the package root.
 | `getTextDirection(locale)`            | `'ltr'` or `'rtl'` for a locale                   |
 | `clearFormatterCaches()`              | Empty every `Intl` formatter cache in the package |
 
+## Migrating from v1
+
+| v1                                    | v2                                                            |
+| ------------------------------------- | ------------------------------------------------------------- |
+| `loadMessages(locale, msgs)` replaced | now merges; use `setMessages` to replace                      |
+| `loadMessagesAsync(url)`              | `loadMessagesAsync(locale, url)`                              |
+| `fallbackLocale: string`              | `string \| string[]`, and parents are consulted automatically |
+| `bidiIsolation` defaulted to `'none'` | defaults to `'auto'` — isolates only in RTL locales           |
+| a miss was silent                     | `onMissingKey(key, locale)` reports it                        |
+
 ## License
 
 ISC
