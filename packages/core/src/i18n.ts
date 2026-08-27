@@ -22,10 +22,15 @@ import {
 import { JsonLoader } from './loaders/json-loader.ts';
 import { expandLocale } from './locales/resolve.ts';
 import type { ILoader } from './loaders/loader.interface.ts';
+import type { IParser, IParserFactory } from './parsers/parser.interface.ts';
 import type { TranslationKey } from './messages/keys.types.ts';
 import { type Messages, MessagesManager } from './messages/messages.ts';
 import type { TranslateArgs } from './messages/values.types.ts';
-import { type BidiIsolation, MF2Parser } from './parsers/mf2-parser.ts';
+import {
+  type BidiIsolation,
+  type I18nFunctions,
+  MF2Parser,
+} from './parsers/mf2-parser.ts';
 
 /**
  * Called when a message fails to compile or format.
@@ -108,6 +113,30 @@ export type I18nConfig = {
    * Defaults to `'none'`, which keeps the formatted output free of the U+2068/U+2069 control characters the spec default inserts.
    */
   bidiIsolation?: BidiIsolation;
+
+  /**
+   * Custom MF2 function handlers, keyed by the name a message calls them with.
+   *
+   * @example
+   * ```ts
+   * createI18n({ locale: 'en', functions: { shout: shoutHandler } });
+   * // messages can now use {$word :shout}
+   * ```
+   */
+  functions?: I18nFunctions;
+
+  /**
+   * Whether the `messageformat` draft functions are available to messages. Defaults to `true`.
+   */
+  draftFunctions?: boolean;
+
+  /**
+   * Replaces the built-in MessageFormat 2 parser. Called once per locale.
+   *
+   * Ignored by nothing else — {@link I18nConfig.functions} and {@link I18nConfig.bidiIsolation} only
+   * reach the built-in parser, so a custom parser owns its own configuration.
+   */
+  parser?: IParserFactory;
 };
 
 /**
@@ -133,7 +162,8 @@ export class I18nInstance {
   private onError: I18nErrorHandler | undefined;
   private onMissingKey: I18nMissingKeyHandler | undefined;
   private bidiIsolation: BidiIsolation;
-  private mf2ParserByLocale: Map<string, MF2Parser>;
+  private parserFactory: IParserFactory;
+  private parserByLocale: Map<string, IParser>;
   private localeChangeListeners = new Set<(locale: string) => void>();
 
   constructor(config: I18nConfig) {
@@ -145,6 +175,9 @@ export class I18nInstance {
       onError,
       onMissingKey,
       bidiIsolation,
+      functions,
+      draftFunctions,
+      parser,
     } = config;
 
     this.locale = locale;
@@ -155,11 +188,19 @@ export class I18nInstance {
           ? fallbackLocale
           : [fallbackLocale];
     this.messagesManager = new MessagesManager();
-    this.mf2ParserByLocale = new Map();
+    this.parserByLocale = new Map();
     this.loaders = [new JsonLoader(), ...(loaders ?? [])];
     this.onError = onError;
     this.onMissingKey = onMissingKey;
     this.bidiIsolation = bidiIsolation ?? 'none';
+    this.parserFactory =
+      parser ??
+      ((parserLocale) =>
+        new MF2Parser(parserLocale, {
+          bidiIsolation: this.bidiIsolation,
+          ...(functions ? { functions } : {}),
+          ...(draftFunctions === undefined ? {} : { draftFunctions }),
+        }));
 
     if (messages) {
       Object.entries(messages).forEach(([locale, messagesLocale]) => {
@@ -483,11 +524,12 @@ export class I18nInstance {
     return undefined;
   }
 
-  private getParser(locale: string): MF2Parser {
-    let parser = this.mf2ParserByLocale.get(locale);
+  private getParser(locale: string): IParser {
+    let parser = this.parserByLocale.get(locale);
+
     if (!parser) {
-      parser = new MF2Parser(locale, { bidiIsolation: this.bidiIsolation });
-      this.mf2ParserByLocale.set(locale, parser);
+      parser = this.parserFactory(locale);
+      this.parserByLocale.set(locale, parser);
     }
 
     return parser;
@@ -546,4 +588,4 @@ export type {
   TranslateArgs,
   TranslationValues,
 } from './messages/values.types.ts';
-export type { BidiIsolation } from './parsers/mf2-parser.ts';
+export type { BidiIsolation, I18nFunctions } from './parsers/mf2-parser.ts';

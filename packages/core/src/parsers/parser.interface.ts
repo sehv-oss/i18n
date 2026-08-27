@@ -22,3 +22,13 @@ export interface IParser {
     onError?: ParseErrorHandler
   ): string;
 }
+
+/**
+ * Builds a parser for one locale.
+ *
+ * Passed as {@link I18nConfig.parser} to replace the built-in MessageFormat 2 parser — for a different
+ * message syntax, or for a stub in tests. Called once per locale and the result is reused.
+ *
+ * @param locale - The locale the parser will format for.
+ */
+export type IParserFactory = (locale: string) => IParser;

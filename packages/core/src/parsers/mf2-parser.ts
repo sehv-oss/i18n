@@ -1,5 +1,5 @@
 import { MessageFormat } from 'messageformat';
-import { DraftFunctions } from 'messageformat/functions';
+import { DraftFunctions, type MessageFunction } from 'messageformat/functions';
 
 import { BoundedCache } from '../caches/bounded.ts';
 import type { IParser, ParseErrorHandler } from './parser.interface.ts';
@@ -13,6 +13,13 @@ import type { IParser, ParseErrorHandler } from './parser.interface.ts';
 export type BidiIsolation = 'default' | 'none';
 
 /**
+ * Custom MF2 function handlers, keyed by the name a message calls them with — `{$x :shout}` looks up `shout`.
+ *
+ * They extend the draft functions unless {@link MF2ParserOptions.draftFunctions} turns those off.
+ */
+export type I18nFunctions = Record<string, MessageFunction<string, string>>;
+
+/**
  * A `MessageFormat` widened over the custom function types contributed by {@link DraftFunctions}, so compiled messages fit a single cache.
  */
 type CompiledMessage = MessageFormat<string, string>;
@@ -23,6 +30,19 @@ export type MF2ParserOptions = {
    * Defaults to `'none'`, which keeps the formatted output free of the U+2068/U+2069 control characters the spec default inserts.
    */
   bidiIsolation?: BidiIsolation;
+
+  /**
+   * Custom function handlers to make available to messages, keyed by name.
+   */
+  functions?: I18nFunctions;
+
+  /**
+   * Whether the `messageformat` draft functions — `:date`, `:time`, `:datetime`, `:currency`, `:unit`,
+   * `:percent`, `:offset` — are available. Defaults to `true`.
+   *
+   * Turn it off to keep them out of the bundle when your messages only use plain placeholders.
+   */
+  draftFunctions?: boolean;
 };
 
 /**
@@ -32,11 +52,18 @@ export type MF2ParserOptions = {
 export class MF2Parser implements IParser {
   private locale: string;
   private bidiIsolation: BidiIsolation;
+  private functions: I18nFunctions;
   private compiled = new BoundedCache<CompiledMessage>();
 
   constructor(locale: string, options?: MF2ParserOptions) {
     this.locale = locale;
     this.bidiIsolation = options?.bidiIsolation ?? 'none';
+    this.functions = {
+      ...(options?.draftFunctions === false
+        ? {}
+        : (DraftFunctions as I18nFunctions)),
+      ...options?.functions,
+    };
   }
 
   /**
@@ -66,7 +93,7 @@ export class MF2Parser implements IParser {
     try {
       const messageFormat = new MessageFormat(this.locale, message, {
         bidiIsolation: this.bidiIsolation,
-        functions: DraftFunctions,
+        functions: this.functions,
       });
 
       this.compiled.set(message, messageFormat);
