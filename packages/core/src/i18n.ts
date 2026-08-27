@@ -20,6 +20,7 @@ import {
   type FormatRelativeTimeUnit,
 } from './formatters/relative-time.ts';
 import { JsonLoader } from './loaders/json-loader.ts';
+import { expandLocale } from './locales/resolve.ts';
 import type { ILoader } from './loaders/loader.interface.ts';
 import type { TranslationKey } from './messages/keys.types.ts';
 import { type Messages, MessagesManager } from './messages/messages.ts';
@@ -47,11 +48,13 @@ export type I18nConfig = {
   locale: string;
 
   /**
-   * Locale to read from when a key is missing in {@link I18nConfig.locale}.
+   * Locale, or locales in descending preference, to read from when a key is missing in {@link I18nConfig.locale}.
    *
-   * Only the message text comes from the fallback — it is still formatted with the current locale, so numbers and plurals follow what the reader sees.
+   * Every tag is expanded to its parents, so `'pt-BR'` also reads from `'pt'` — and the current locale is
+   * expanded the same way, before any fallback is consulted.
+   * Only the message text comes from the fallback; it is still formatted with the current locale, so numbers and plurals follow what the reader sees.
    */
-  fallbackLocale?: string;
+  fallbackLocale?: string | string[];
 
   /**
    * Messages per locale, flat or nested. Equivalent to calling {@link I18nInstance.loadMessages} once per entry.
@@ -95,7 +98,7 @@ export type I18nConfig = {
  */
 export class I18nInstance {
   private locale: string;
-  private fallbackLocale: string | undefined;
+  private fallbackLocales: string[];
   private messagesManager: MessagesManager;
   private loaders: ILoader[];
   private onError: I18nErrorHandler | undefined;
@@ -114,7 +117,12 @@ export class I18nInstance {
     } = config;
 
     this.locale = locale;
-    this.fallbackLocale = fallbackLocale;
+    this.fallbackLocales =
+      fallbackLocale === undefined
+        ? []
+        : Array.isArray(fallbackLocale)
+          ? fallbackLocale
+          : [fallbackLocale];
     this.messagesManager = new MessagesManager();
     this.mf2ParserByLocale = new Map();
     this.loaders = [new JsonLoader(), ...(loaders ?? [])];
@@ -159,10 +167,36 @@ export class I18nInstance {
   }
 
   /**
-   * The locale read from when a key is missing, or `undefined` when none was configured.
+   * The first configured fallback locale, or `undefined` when none was configured.
    */
   public getFallbackLocale(): string | undefined {
-    return this.fallbackLocale;
+    return this.fallbackLocales[0];
+  }
+
+  /**
+   * Every configured fallback locale, in the order they are consulted.
+   */
+  public getFallbackLocales(): string[] {
+    return [...this.fallbackLocales];
+  }
+
+  /**
+   * The locales consulted for a key, in order: the current locale and its parents, then each
+   * fallback locale and its parents. Deduplicated, so a tag appears once.
+   *
+   * @example
+   * ```ts
+   * createI18n({ locale: 'pt-BR', fallbackLocale: 'en-US' }).getLocaleChain();
+   * // ['pt-BR', 'pt', 'en-US', 'en']
+   * ```
+   */
+  public getLocaleChain(): string[] {
+    const chain = [
+      ...expandLocale(this.locale),
+      ...this.fallbackLocales.flatMap((locale) => expandLocale(locale)),
+    ];
+
+    return Array.from(new Set(chain));
   }
 
   /**
@@ -178,8 +212,8 @@ export class I18nInstance {
    * Formats the message at `key` for the current locale.
    *
    * Lookup walks dot-separated segments, except that a flat key containing literal dots wins over the nested path.
-   * Existing dictionaries keep working unchanged. When the key resolves in neither the current locale nor {@link I18nConfig.fallbackLocale},
-   * the key itself is returned, so a missing translation shows up without being fatal.
+   * Existing dictionaries keep working unchanged. The key is looked up across {@link I18nInstance.getLocaleChain}, and when it resolves
+   * in none of those locales the key itself is returned, so a missing translation shows up without being fatal.
    *
    * `values` is required exactly when the message declares placeholders, and optional otherwise.
    * That check only exists once {@link Register} has been augmented; without it, keys stay `string` and `values` stays optional.
@@ -199,19 +233,18 @@ export class I18nInstance {
     key: TKey,
     ...values: TranslateArgs<TKey>
   ): string {
-    let message = this.messagesManager.getMessage(this.locale, key);
-    if (!message && this.fallbackLocale) {
-      message = this.messagesManager.getMessage(this.fallbackLocale, key);
-    }
+    const resolved = this.resolveMessage(key);
 
-    if (!message) {
+    if (!resolved) {
       return key;
     }
 
     const [params] = values as [Record<string, unknown>?];
     const parser = this.getParser(this.locale);
 
-    return parser.parse(message, params, (error) => this.onError?.(error, key));
+    return parser.parse(resolved.message, params, (error) =>
+      this.onError?.(error, key)
+    );
   }
 
   /**
@@ -359,6 +392,18 @@ export class I18nInstance {
     this.loadMessages(locale, messages);
   }
 
+  private resolveMessage(
+    key: string
+  ): { message: string; locale: string } | undefined {
+    for (const locale of this.getLocaleChain()) {
+      const message = this.messagesManager.getMessage(locale, key);
+
+      if (message !== undefined) return { message, locale };
+    }
+
+    return undefined;
+  }
+
   private getParser(locale: string): MF2Parser {
     let parser = this.mf2ParserByLocale.get(locale);
     if (!parser) {
@@ -423,6 +468,7 @@ export function createI18n(config: I18nConfig): I18nInstance {
 }
 
 export * from './formatters/formatters.ts';
+export { expandLocale, resolveLocale } from './locales/resolve.ts';
 export type * from './loaders/loader.interface.ts';
 export type * from './parsers/parser.interface.ts';
 export type { Messages } from './messages/messages.ts';

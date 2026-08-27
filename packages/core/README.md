@@ -68,6 +68,37 @@ i18n.translate('home.nav.back');
 
 A flat key that literally contains dots still wins over the nested path, so existing dictionaries keep working unchanged.
 
+### Locale fallback
+
+Lookup walks the current locale, its parents, then each fallback locale and its parents:
+
+```typescript
+const i18n = createI18n({
+  locale: 'pt-BR',
+  fallbackLocale: ['pt', 'en'],
+  messages: { pt: { greeting: 'Olá!' }, en: { bye: 'Bye' } },
+});
+
+i18n.getLocaleChain(); // ['pt-BR', 'pt', 'en']
+i18n.translate('greeting'); // → "Olá!"  (from 'pt')
+i18n.translate('bye'); // → "Bye"   (from 'en')
+```
+
+Only the message text comes from the fallback — formatting still uses the current locale.
+
+### Picking a locale
+
+`resolveLocale` matches a request against what you actually have loaded:
+
+```typescript
+import { resolveLocale } from '@sehv-oss/i18n';
+
+const locale = resolveLocale(navigator.languages, i18n.getLocales()) ?? 'en';
+i18n.setLocale(locale);
+```
+
+On the server, pass the parsed `Accept-Language` tags instead.
+
 ### Type-safe keys
 
 Augment `Register` once and every key, dot path and placeholder is checked by the compiler — in this package and in `@sehv-oss/i18n-react` alike:
@@ -164,7 +195,7 @@ Creates an i18n instance.
 | Option           | Description                                                                                               |
 | ---------------- | --------------------------------------------------------------------------------------------------------- |
 | `locale`         | Current locale                                                                                            |
-| `fallbackLocale` | Locale to read from when a key is missing                                                                 |
+| `fallbackLocale` | Locale, or locales in descending preference, to read from when a key is missing                           |
 | `messages`       | Messages per locale, flat or nested                                                                       |
 | `loaders`        | Extra loaders for `loadMessagesAsync`                                                                     |
 | `onError`        | `(error, key) => void`, called on parse or resolution failures. Silent when omitted                       |
@@ -184,6 +215,8 @@ Creates an i18n instance.
 | `loadMessagesAsync(url)`                    | Load messages via fetch     |
 | `setLocale(locale)`                         | Change current locale       |
 | `getLocales()`                              | Get available locales       |
+| `getLocaleChain()`                          | Get the resolution order    |
+| `getFallbackLocales()`                      | Get every fallback locale   |
 | `onLocaleChange(listener)`                  | Subscribe to locale changes |
 
 ## License

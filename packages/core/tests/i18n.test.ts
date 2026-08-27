@@ -341,3 +341,42 @@ test('should isolate placeholders when bidiIsolation is default', () => {
 
   expect(result).toBe('Hello, ⁨World⁩!');
 });
+
+test('should fall back from a regional locale to its parent', () => {
+  const i18n = createI18n({ locale: 'pt-BR', messages: { pt: { a: 'PT A' } } });
+
+  expect(i18n.translate('a')).toBe('PT A');
+});
+
+test('should prefer the more specific locale in the chain', () => {
+  const i18n = createI18n({
+    locale: 'pt-BR',
+    messages: { pt: { a: 'PT A' }, 'pt-BR': { a: 'PT-BR A' } },
+  });
+
+  expect(i18n.translate('a')).toBe('PT-BR A');
+});
+
+test('should walk every configured fallback locale in order', () => {
+  const i18n = createI18n({
+    locale: 'fr',
+    fallbackLocale: ['es', 'en'],
+    messages: { es: { a: 'ES A' }, en: { a: 'EN A', b: 'EN B' } },
+  });
+
+  expect(i18n.translate('a')).toBe('ES A');
+  expect(i18n.translate('b')).toBe('EN B');
+});
+
+test('should expose the resolution chain', () => {
+  const i18n = createI18n({ locale: 'pt-BR', fallbackLocale: 'en-US' });
+
+  expect(i18n.getLocaleChain()).toEqual(['pt-BR', 'pt', 'en-US', 'en']);
+});
+
+test('should keep getFallbackLocale returning the first fallback', () => {
+  const i18n = createI18n({ locale: 'fr', fallbackLocale: ['es', 'en'] });
+
+  expect(i18n.getFallbackLocale()).toBe('es');
+  expect(i18n.getFallbackLocales()).toEqual(['es', 'en']);
+});
