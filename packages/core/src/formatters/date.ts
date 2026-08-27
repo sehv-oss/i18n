@@ -11,7 +11,10 @@ export type FormatDateOptions = Intl.DateTimeFormatOptions & {
   locale?: string;
 };
 
-const cache = new FormatterCache(Intl.DateTimeFormat);
+const cache = new FormatterCache(
+  (locale: string, options?: Intl.DateTimeFormatOptions) =>
+    new Intl.DateTimeFormat(locale, options)
+);
 
 /**
  * Standalone date and time formatting, for code that has a locale but no i18n instance.
@@ -40,5 +43,15 @@ export class FormatDate {
     const formatter = cache.get(locale, formatOptions);
 
     return formatter.format(value);
+  }
+
+  /**
+   * Empties the cached `Intl` formatter instances.
+   *
+   * Rarely needed in an application; useful in a long-lived process that has finished with a set of
+   * locales, and in tests that assert on instance identity.
+   */
+  public static clearCache(): void {
+    cache.clear();
   }
 }

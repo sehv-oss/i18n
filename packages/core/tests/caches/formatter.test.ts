@@ -1,49 +1,51 @@
 import { expect, test } from 'vitest';
 import { FormatterCache } from '../../src/caches/formatter.ts';
 
-test('should create and cache formatter instances', () => {
-  const cache = new FormatterCache(Intl.NumberFormat);
+test('should reuse a formatter for the same locale and options', () => {
+  const cache = new FormatterCache(
+    (locale: string, options?: Intl.NumberFormatOptions) =>
+      new Intl.NumberFormat(locale, options)
+  );
 
-  const formatter1 = cache.get('en');
-  const formatter2 = cache.get('en');
-
-  expect(formatter1).toBe(formatter2);
+  expect(cache.get('en')).toBe(cache.get('en'));
+  expect(cache.get('en', { style: 'percent' })).toBe(
+    cache.get('en', { style: 'percent' })
+  );
 });
 
-test('should create different instances for different locales', () => {
-  const cache = new FormatterCache(Intl.NumberFormat);
+test('should build a different formatter per locale and per options', () => {
+  const cache = new FormatterCache(
+    (locale: string, options?: Intl.NumberFormatOptions) =>
+      new Intl.NumberFormat(locale, options)
+  );
 
-  const formatterEn = cache.get('en');
-  const formatterPt = cache.get('pt-BR');
-
-  expect(formatterEn).not.toBe(formatterPt);
+  expect(cache.get('en')).not.toBe(cache.get('pt-BR'));
+  expect(cache.get('en')).not.toBe(cache.get('en', { style: 'percent' }));
 });
 
-test('should create different instances for different options', () => {
-  const cache = new FormatterCache(Intl.NumberFormat);
+test('should evict the oldest entry past maxSize', () => {
+  let built = 0;
+  const cache = new FormatterCache((locale: string) => {
+    built++;
 
-  const formatter1 = cache.get('en', { minimumFractionDigits: 2 });
-  const formatter2 = cache.get('en', { minimumFractionDigits: 4 });
+    return new Intl.NumberFormat(locale);
+  }, 2);
 
-  expect(formatter1).not.toBe(formatter2);
+  cache.get('en');
+  cache.get('pt');
+  cache.get('fr');
+  cache.get('en');
+
+  expect(built).toBe(4);
 });
 
-test('should cache instances with same locale and options', () => {
-  const cache = new FormatterCache(Intl.NumberFormat);
-  const options = { minimumFractionDigits: 2 };
+test('should rebuild after clear', () => {
+  const cache = new FormatterCache(
+    (locale: string) => new Intl.NumberFormat(locale)
+  );
 
-  const formatter1 = cache.get('en', options);
-  const formatter2 = cache.get('en', options);
-
-  expect(formatter1).toBe(formatter2);
-});
-
-test('should clear the cache', () => {
-  const cache = new FormatterCache(Intl.NumberFormat);
-
-  const formatter1 = cache.get('en');
+  const first = cache.get('en');
   cache.clear();
-  const formatter2 = cache.get('en');
 
-  expect(formatter1).not.toBe(formatter2);
+  expect(cache.get('en')).not.toBe(first);
 });
