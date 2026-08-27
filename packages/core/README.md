@@ -157,6 +157,12 @@ i18n.formatList(['apple', 'banana', 'orange']);
 
 i18n.formatRelativeTime(-2, 'days');
 // → "2 days ago"
+
+i18n.formatDisplayName('en-US', { type: 'language' });
+// → "English (United States)"
+
+i18n.formatDuration({ hours: 1, minutes: 30 });
+// → "1 hr, 30 min"
 ```
 
 ### Lazy Loading
@@ -268,24 +274,26 @@ Creates an i18n instance.
 
 ### Methods
 
-| Method                                      | Description                               |
-| ------------------------------------------- | ----------------------------------------- |
-| `translate(key, values?)`                   | Translate a message key                   |
-| `hasMessage(key)`                           | Whether a key resolves                    |
-| `formatNumber(value, options?)`             | Format a number                           |
-| `formatCurrency(value, currency, options?)` | Format currency                           |
-| `formatDate(value, options?)`               | Format a date                             |
-| `formatList(values, options?)`              | Format a list                             |
-| `formatRelativeTime(value, unit, options?)` | Format relative time                      |
-| `loadMessages(locale, messages)`            | Load messages synchronously, deep-merging |
-| `setMessages(locale, messages)`             | Replace every message for a locale        |
-| `removeMessages(locale)`                    | Drop a locale entirely                    |
-| `loadMessagesAsync(locale, url)`            | Load messages via fetch                   |
-| `setLocale(locale)`                         | Change current locale                     |
-| `getLocales()`                              | Get available locales                     |
-| `getLocaleChain()`                          | Get the resolution order                  |
-| `getFallbackLocales()`                      | Get every fallback locale                 |
-| `onLocaleChange(listener)`                  | Subscribe to locale changes               |
+| Method                                      | Description                                 |
+| ------------------------------------------- | ------------------------------------------- |
+| `translate(key, values?)`                   | Translate a message key                     |
+| `hasMessage(key)`                           | Whether a key resolves                      |
+| `formatNumber(value, options?)`             | Format a number                             |
+| `formatCurrency(value, currency, options?)` | Format currency                             |
+| `formatDate(value, options?)`               | Format a date                               |
+| `formatList(values, options?)`              | Format a list                               |
+| `formatRelativeTime(value, unit, options?)` | Format relative time                        |
+| `formatDisplayName(value, options)`         | Name a language, region, script or currency |
+| `formatDuration(value, options?)`           | Format a duration                           |
+| `loadMessages(locale, messages)`            | Load messages synchronously, deep-merging   |
+| `setMessages(locale, messages)`             | Replace every message for a locale          |
+| `removeMessages(locale)`                    | Drop a locale entirely                      |
+| `loadMessagesAsync(locale, url)`            | Load messages via fetch                     |
+| `setLocale(locale)`                         | Change current locale                       |
+| `getLocales()`                              | Get available locales                       |
+| `getLocaleChain()`                          | Get the resolution order                    |
+| `getFallbackLocales()`                      | Get every fallback locale                   |
+| `onLocaleChange(listener)`                  | Subscribe to locale changes                 |
 
 ## License
 

@@ -197,6 +197,8 @@ See the [core README](../core/README.md#type-safe-keys) for how the message shap
 | `useFormatNumber()`       | `formatNumber(value, options?)`             |
 | `useFormatCurrency()`     | `formatCurrency(value, currency, options?)` |
 | `useFormatDate()`         | `formatDate(value, options?)`               |
+| `useFormatDisplayName()`  | `formatDisplayName(value, options)`         |
+| `useFormatDuration()`     | `formatDuration(value, options?)`           |
 | `useFormatList()`         | `formatList(values, options?)`              |
 | `useFormatRelativeTime()` | `formatRelativeTime(value, unit, options?)` |
 
@@ -208,6 +210,8 @@ See the [core README](../core/README.md#type-safe-keys) for how the message shap
 | `FormatNumber`       | `value`, `...options`             |
 | `FormatCurrency`     | `value`, `currency`, `...options` |
 | `FormatDate`         | `value`, `...options`             |
+| `FormatDisplayName`  | `value`, `type`, `...options`     |
+| `FormatDuration`     | `value`, `...options`             |
 | `FormatList`         | `values`, `...options`            |
 | `FormatRelativeTime` | `value`, `unit`, `...options`     |
 
