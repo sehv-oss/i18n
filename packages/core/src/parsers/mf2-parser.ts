@@ -153,6 +153,9 @@ function resolveBidiIsolation(
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> a8fb1c7 (feat!: render markup placeholders as React elements)
 function collapseParts(parts: MessagePart<string>[]): I18nPart[] {
   const result: I18nPart[] = [];
 
@@ -199,6 +202,9 @@ function stringifyPart(part: MessagePart<string>): string {
   return 'value' in part && part.value !== undefined ? String(part.value) : '';
 }
 
+<<<<<<< HEAD
 =======
 >>>>>>> a207d2b (feat(core)!: default bidiIsolation to auto)
+=======
+>>>>>>> a8fb1c7 (feat!: render markup placeholders as React elements)
 function silent(): void {}
