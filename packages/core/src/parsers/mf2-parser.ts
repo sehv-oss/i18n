@@ -28,13 +28,6 @@ export type BidiIsolation = 'auto' | 'default' | 'none';
 export type I18nFunctions = Record<string, MessageFunction<string, string>>;
 
 /**
- * Custom MF2 function handlers, keyed by the name a message calls them with — `{$x :shout}` looks up `shout`.
- *
- * They extend the draft functions unless {@link MF2ParserOptions.draftFunctions} turns those off.
- */
-export type I18nFunctions = Record<string, MessageFunction<string, string>>;
-
-/**
  * A `MessageFormat` widened over the custom function types contributed by {@link DraftFunctions}, so compiled messages fit a single cache.
  */
 type CompiledMessage = MessageFormat<string, string>;
@@ -159,6 +152,7 @@ function resolveBidiIsolation(
   return getTextDirection(locale) === 'rtl' ? 'default' : 'none';
 }
 
+<<<<<<< HEAD
 function collapseParts(parts: MessagePart<string>[]): I18nPart[] {
   const result: I18nPart[] = [];
 
@@ -205,4 +199,6 @@ function stringifyPart(part: MessagePart<string>): string {
   return 'value' in part && part.value !== undefined ? String(part.value) : '';
 }
 
+=======
+>>>>>>> a207d2b (feat(core)!: default bidiIsolation to auto)
 function silent(): void {}
