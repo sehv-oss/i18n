@@ -380,3 +380,46 @@ test('should keep getFallbackLocale returning the first fallback', () => {
   expect(i18n.getFallbackLocale()).toBe('es');
   expect(i18n.getFallbackLocales()).toEqual(['es', 'en']);
 });
+
+test('should report a missing key to onMissingKey', () => {
+  const onMissingKey = vi.fn();
+  const i18n = createI18n({ locale: 'en', messages: { en: {} }, onMissingKey });
+
+  const result = i18n.translate('nope');
+
+  expect(onMissingKey).toHaveBeenCalledWith('nope', 'en');
+  expect(result).toBe('nope');
+});
+
+test('should use the string returned by onMissingKey', () => {
+  const i18n = createI18n({
+    locale: 'en',
+    messages: { en: {} },
+    onMissingKey: () => '',
+  });
+
+  expect(i18n.translate('nope')).toBe('');
+});
+
+test('should not call onMissingKey when a fallback locale resolves the key', () => {
+  const onMissingKey = vi.fn();
+  const i18n = createI18n({
+    locale: 'fr',
+    fallbackLocale: 'en',
+    messages: { en: { a: 'EN A' } },
+    onMissingKey,
+  });
+
+  expect(i18n.translate('a')).toBe('EN A');
+  expect(onMissingKey).not.toHaveBeenCalled();
+});
+
+test('should report whether a key resolves', () => {
+  const i18n = createI18n({
+    locale: 'pt-BR',
+    messages: { pt: { home: { title: 'Início' } } },
+  });
+
+  expect(i18n.hasMessage('home.title')).toBe(true);
+  expect(i18n.hasMessage('home.subtitle')).toBe(false);
+});

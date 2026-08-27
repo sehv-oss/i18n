@@ -192,20 +192,22 @@ await i18n.loadMessagesAsync('/locales/en.yaml');
 
 Creates an i18n instance.
 
-| Option           | Description                                                                                               |
-| ---------------- | --------------------------------------------------------------------------------------------------------- |
-| `locale`         | Current locale                                                                                            |
-| `fallbackLocale` | Locale, or locales in descending preference, to read from when a key is missing                           |
-| `messages`       | Messages per locale, flat or nested                                                                       |
-| `loaders`        | Extra loaders for `loadMessagesAsync`                                                                     |
-| `onError`        | `(error, key) => void`, called on parse or resolution failures. Silent when omitted                       |
-| `bidiIsolation`  | `'none'` (default) or `'default'`, which wraps placeholders in the U+2068/U+2069 characters the spec adds |
+| Option           | Description                                                                                                            |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `locale`         | Current locale                                                                                                         |
+| `fallbackLocale` | Locale, or locales in descending preference, to read from when a key is missing                                        |
+| `messages`       | Messages per locale, flat or nested                                                                                    |
+| `loaders`        | Extra loaders for `loadMessagesAsync`                                                                                  |
+| `onError`        | `(error, key) => void`, called on parse or resolution failures. Silent when omitted                                    |
+| `onMissingKey`   | `(key, locale) => string \| void`, called when a key resolves nowhere. Return a string to render it instead of the key |
+| `bidiIsolation`  | `'none'` (default) or `'default'`, which wraps placeholders in the U+2068/U+2069 characters the spec adds              |
 
 ### Methods
 
 | Method                                      | Description                 |
 | ------------------------------------------- | --------------------------- |
 | `translate(key, values?)`                   | Translate a message key     |
+| `hasMessage(key)`                           | Whether a key resolves      |
 | `formatNumber(value, options?)`             | Format a number             |
 | `formatCurrency(value, currency, options?)` | Format currency             |
 | `formatDate(value, options?)`               | Format a date               |
