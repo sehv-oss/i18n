@@ -1,3 +1,5 @@
+import { mergeMessages } from './merge.ts';
+
 /**
  * A locale's messages: MessageFormat 2 source strings, flat or nested to any depth.
  *
@@ -31,6 +33,19 @@ export class MessagesManager {
 
   public set(locale: string, messages: Messages): void {
     this.messages.set(locale, messages);
+  }
+
+  public merge(locale: string, messages: Messages): void {
+    const existing = this.messages.get(locale);
+
+    this.messages.set(
+      locale,
+      existing ? mergeMessages(existing, messages) : messages
+    );
+  }
+
+  public delete(locale: string): boolean {
+    return this.messages.delete(locale);
   }
 
   public has(locale: string): boolean {
