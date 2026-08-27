@@ -423,3 +423,36 @@ test('should report whether a key resolves', () => {
   expect(i18n.hasMessage('home.title')).toBe(true);
   expect(i18n.hasMessage('home.subtitle')).toBe(false);
 });
+
+test('should merge messages into an existing locale', () => {
+  const i18n = createI18n({
+    locale: 'en',
+    messages: { en: { common: { ok: 'OK' } } },
+  });
+
+  i18n.loadMessages('en', { checkout: { pay: 'Pay' } });
+
+  expect(i18n.translate('common.ok')).toBe('OK');
+  expect(i18n.translate('checkout.pay')).toBe('Pay');
+});
+
+test('should replace a locale with setMessages', () => {
+  const i18n = createI18n({
+    locale: 'en',
+    messages: { en: { common: { ok: 'OK' } } },
+  });
+
+  i18n.setMessages('en', { checkout: { pay: 'Pay' } });
+
+  expect(i18n.translate('common.ok')).toBe('common.ok');
+  expect(i18n.translate('checkout.pay')).toBe('Pay');
+});
+
+test('should drop a locale with removeMessages', () => {
+  const i18n = createI18n({ locale: 'en', messages: { en: { a: 'A' } } });
+
+  i18n.removeMessages('en');
+
+  expect(i18n.getLocales()).toEqual([]);
+  expect(i18n.translate('a')).toBe('a');
+});

@@ -395,17 +395,44 @@ export class I18nInstance {
   }
 
   /**
-   * Registers messages for a locale, replacing whatever was stored for it.
+   * Registers messages for a locale, deep-merging them into whatever is already stored.
    *
+   * Merging is what makes namespaced dictionaries work: load `common` and `checkout` separately
+   * and both stay reachable. Use {@link I18nInstance.setMessages} when you want the old replace behavior.
+   *
+   * @param locale - The locale the messages belong to.
    * @param messages - Flat or nested, read back by dot path.
    *
    * @example
    * ```ts
-   * i18n.loadMessages('pt-BR', { greeting: 'Olá, {$name}!' });
+   * i18n.loadMessages('pt-BR', { common: { ok: 'OK' } });
+   * i18n.loadMessages('pt-BR', { checkout: { pay: 'Pagar' } });
+   * i18n.translate('common.ok'); // still "OK"
    * ```
    */
   public loadMessages(locale: string, messages: Messages): void {
+    this.messagesManager.merge(locale, messages);
+  }
+
+  /**
+   * Replaces every message stored for a locale.
+   *
+   * @param locale - The locale to overwrite.
+   * @param messages - Flat or nested, read back by dot path.
+   */
+  public setMessages(locale: string, messages: Messages): void {
     this.messagesManager.set(locale, messages);
+  }
+
+  /**
+   * Drops every message stored for a locale, and the locale itself from {@link I18nInstance.getLocales}.
+   *
+   * Long-lived servers use this to release dictionaries they no longer serve.
+   *
+   * @param locale - The locale to drop.
+   */
+  public removeMessages(locale: string): void {
+    this.messagesManager.delete(locale);
   }
 
   /**
