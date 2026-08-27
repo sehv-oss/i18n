@@ -436,20 +436,23 @@ export class I18nInstance {
   }
 
   /**
-   * Fetches a message file and registers it, picking the loader by file extension.
+   * Fetches a message file and merges it into `locale`, picking the loader by file extension.
    *
-   * The locale comes from the file name: `/locales/pt-BR.json` loads into `pt-BR`.
-   * A name that is not a valid locale tag falls back to the current locale.
+   * The locale is explicit rather than inferred from the file name, which is what lets one locale be
+   * split across namespaced files — `/locales/en/common.json` and `/locales/en/checkout.json` both
+   * load into `'en'` and both stay reachable.
    *
+   * @param locale - The locale to merge the file into.
    * @param url - Anything `fetch` accepts, with an extension a loader claims.
    * @throws If the response is not ok, or if no loader handles the extension. The loader itself may also throw on malformed content.
    *
    * @example
    * ```ts
-   * await i18n.loadMessagesAsync('/locales/en.json');
+   * await i18n.loadMessagesAsync('en', '/locales/en/common.json');
+   * await i18n.loadMessagesAsync('en', '/locales/en/checkout.json');
    * ```
    */
-  public async loadMessagesAsync(url: string): Promise<void> {
+  public async loadMessagesAsync(locale: string, url: string): Promise<void> {
     const response = await fetch(url);
 
     if (!response.ok) {
@@ -465,10 +468,7 @@ export class I18nInstance {
       throw new Error(`No loader found for ${url}.`);
     }
 
-    const messages = loader.parse(content);
-    const locale = this.extractLocaleFromUrl(url);
-
-    this.loadMessages(locale, messages);
+    this.loadMessages(locale, loader.parse(content));
   }
 
   private resolveMessage(
@@ -503,18 +503,6 @@ export class I18nInstance {
     const match = url.match(/\.[^.]+$/);
 
     return match?.[0] ?? '';
-  }
-
-  private extractLocaleFromUrl(url: string): string {
-    const filename = url.split('/').pop() ?? '';
-    const name = filename.replace(/\.[^.]+$/, '');
-
-    try {
-      const [canonical] = Intl.getCanonicalLocales(name);
-      return canonical ?? this.locale;
-    } catch {
-      return this.locale;
-    }
   }
 }
 

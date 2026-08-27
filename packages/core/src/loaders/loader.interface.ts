@@ -20,7 +20,7 @@ import type { Messages } from '../messages/messages.ts';
  * };
  *
  * const i18n = createI18n({ locale: 'en', loaders: [yamlLoader] });
- * await i18n.loadMessagesAsync('/locales/en.yaml');
+ * await i18n.loadMessagesAsync('en', '/locales/en.yaml');
  * ```
  */
 export interface ILoader {
