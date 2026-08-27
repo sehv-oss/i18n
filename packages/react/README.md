@@ -123,6 +123,33 @@ richTranslate('terms', undefined, {
 
 A placeholder with no matching entry in `tags` still renders its text, so a missing renderer degrades instead of dropping content.
 
+### Server rendering
+
+`I18nInstance` is mutable — `setLocale` changes it for everyone holding it. On a server that means
+**one instance per request**, never a module-level singleton:
+
+```tsx
+// ✗ leaks the last request's locale into the next one
+const i18n = createI18n({ locale: 'en', messages });
+
+// ✓ one per request
+export function handler(request: Request) {
+  const i18n = createI18n({ locale: localeFrom(request), messages });
+
+  return renderToString(
+    <I18nProvider i18n={i18n}>
+      <App />
+    </I18nProvider>
+  );
+}
+```
+
+A module-level instance is fine in the browser, where there is only ever one user.
+
+`I18nProvider` reads its locale through `useSyncExternalStore` with a server snapshot, so the markup
+the server produces and the markup the client hydrates agree as long as both build the instance with
+the same locale.
+
 ### Type-safe keys
 
 Augment `Register` once — in the core package — and the hooks and components pick it up on their own. There is no generic to thread, no factory to call and nothing extra to pass to the provider:

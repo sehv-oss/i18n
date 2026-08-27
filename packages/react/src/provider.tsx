@@ -17,7 +17,9 @@ export type I18nProviderProps = {
 /**
  * Makes an i18n instance available to the hooks and components below it, and re-renders that subtree whenever the locale changes.
  *
- * It subscribes to the instance rather than owning the locale, so `i18n.setLocale` from anywhere — including outside React — still updates the tree.
+ * It subscribes through `useSyncExternalStore`, so `i18n.setLocale` from anywhere — including outside
+ * React, and including before this component's effects have run — still updates the tree, and server
+ * rendering reads the same snapshot the client hydrates against.
  *
  * @example
  * ```tsx
@@ -38,17 +40,21 @@ export type I18nProviderProps = {
 export function I18nProvider(props: I18nProviderProps) {
   const { i18n, children } = props;
 
-  const [locale, setLocale] = React.useState(i18n.getLocale());
+  const subscribe = React.useCallback(
+    (onStoreChange: () => void) => i18n.onLocaleChange(onStoreChange),
+    [i18n]
+  );
 
-  React.useEffect(() => {
-    return i18n.onLocaleChange(setLocale);
-  }, [i18n]);
+  const getSnapshot = React.useCallback(() => i18n.getLocale(), [i18n]);
+
+  const locale = React.useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getSnapshot
+  );
 
   const contextValue = React.useMemo<I18nContextValue>(
-    () => ({
-      i18n,
-      locale,
-    }),
+    () => ({ i18n, locale }),
     [i18n, locale]
   );
 
