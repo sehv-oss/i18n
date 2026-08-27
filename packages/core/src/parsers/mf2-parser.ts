@@ -1,9 +1,14 @@
-import { MessageFormat } from 'messageformat';
+import {
+  MessageFormat,
+  type MessageMarkupPart,
+  type MessagePart,
+} from 'messageformat';
 import { DraftFunctions, type MessageFunction } from 'messageformat/functions';
 
 import { BoundedCache } from '../caches/bounded.ts';
 import { getTextDirection } from '../locales/direction.ts';
 import type { IParser, ParseErrorHandler } from './parser.interface.ts';
+import type { I18nPart } from './parts.types.ts';
 
 /**
  * How placeholders with unknown directionality are isolated from the rest of the message.
@@ -96,6 +101,31 @@ export class MF2Parser implements IParser {
     return messageFormat.format(values, onError ?? silent);
   }
 
+  /**
+   * Formats `message` into text and markup parts.
+   *
+   * Adjacent text is merged, so the result alternates between runs of text and markup boundaries.
+   * A message that fails to compile comes back as a single text part holding its own source, matching
+   * what {@link MF2Parser.parse} returns in the same situation.
+   *
+   * @param message - The message source text.
+   * @param values - Placeholder values the message reads.
+   * @param onError - Notified on compile or format failure.
+   * @returns The message as a flat stream of text and markup parts.
+   */
+  public parseToParts(
+    message: string,
+    values: Record<string, unknown> = {},
+    onError?: ParseErrorHandler
+  ): I18nPart[] {
+    const messageFormat = this.compile(message, onError);
+    if (!messageFormat) return [{ type: 'text', value: message }];
+
+    return collapseParts(
+      messageFormat.formatToParts(values, onError ?? silent)
+    );
+  }
+
   private compile(
     message: string,
     onError?: ParseErrorHandler
@@ -127,6 +157,52 @@ function resolveBidiIsolation(
   if (isolation !== 'auto') return isolation;
 
   return getTextDirection(locale) === 'rtl' ? 'default' : 'none';
+}
+
+function collapseParts(parts: MessagePart<string>[]): I18nPart[] {
+  const result: I18nPart[] = [];
+
+  for (const part of parts) {
+    if (isMarkupPart(part)) {
+      result.push({
+        type: 'markup',
+        kind: part.kind,
+        name: part.name,
+        ...(part.options ? { options: part.options } : {}),
+      });
+      continue;
+    }
+
+    const value = stringifyPart(part);
+    if (!value) continue;
+
+    const last = result[result.length - 1];
+
+    if (last?.type === 'text') {
+      last.value += value;
+      continue;
+    }
+
+    result.push({ type: 'text', value });
+  }
+
+  return result;
+}
+
+/**
+ * `MessagePart<string>` cannot discriminate on `type` alone — its expression branch is typed with an
+ * open `string`, which overlaps `'markup'` — so the markup fields are checked too.
+ */
+function isMarkupPart(part: MessagePart<string>): part is MessageMarkupPart {
+  return part.type === 'markup' && 'kind' in part && 'name' in part;
+}
+
+function stringifyPart(part: MessagePart<string>): string {
+  if ('parts' in part && Array.isArray(part.parts)) {
+    return part.parts.map((inner) => String(inner.value ?? '')).join('');
+  }
+
+  return 'value' in part && part.value !== undefined ? String(part.value) : '';
 }
 
 function silent(): void {}
