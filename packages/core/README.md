@@ -242,7 +242,7 @@ Creates an i18n instance.
 | `loaders`        | Extra loaders for `loadMessagesAsync`                                                                                  |
 | `onError`        | `(error, key) => void`, called on parse or resolution failures. Silent when omitted                                    |
 | `onMissingKey`   | `(key, locale) => string \| void`, called when a key resolves nowhere. Return a string to render it instead of the key |
-| `bidiIsolation`  | `'none'` (default) or `'default'`, which wraps placeholders in the U+2068/U+2069 characters the spec adds              |
+| `bidiIsolation`  | `'auto'` (default), `'none'` or `'default'`. `'auto'` isolates placeholders only in right-to-left locales              |
 | `functions`      | Custom MF2 function handlers, keyed by the name a message calls them with                                              |
 | `draftFunctions` | Whether the `messageformat` draft functions are available. Defaults to `true`                                          |
 | `parser`         | `(locale) => IParser`, replacing the built-in MessageFormat 2 parser                                                   |

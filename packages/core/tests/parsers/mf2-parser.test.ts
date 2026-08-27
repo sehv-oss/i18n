@@ -219,3 +219,32 @@ test('should drop the draft functions when asked', () => {
   expect(errors.length).toBeGreaterThan(0);
   expect(result).toContain('d');
 });
+
+const FSI = '⁨';
+const PDI = '⁩';
+
+test('should not isolate placeholders in a left-to-right locale by default', () => {
+  const parser = new MF2Parser('en');
+
+  const result = parser.parse('Hello, {$name}!', { name: 'World' });
+
+  expect(result).toBe('Hello, World!');
+  expect(result).not.toContain(FSI);
+});
+
+test('should isolate placeholders in a right-to-left locale by default', () => {
+  const parser = new MF2Parser('he');
+
+  const result = parser.parse('{$name}', { name: 'World' });
+
+  expect(result).toContain(FSI);
+  expect(result).toContain(PDI);
+});
+
+test('should honour an explicit bidiIsolation', () => {
+  const forced = new MF2Parser('en', { bidiIsolation: 'default' });
+  const off = new MF2Parser('he', { bidiIsolation: 'none' });
+
+  expect(forced.parse('{$name}', { name: 'World' })).toContain(FSI);
+  expect(off.parse('{$name}', { name: 'World' })).not.toContain(FSI);
+});
