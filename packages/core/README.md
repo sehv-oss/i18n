@@ -200,6 +200,34 @@ const i18n = createI18n({
 await i18n.loadMessagesAsync('en', '/locales/en.yaml');
 ```
 
+### Custom Functions
+
+Register MF2 function handlers and call them from messages:
+
+```typescript
+const i18n = createI18n({
+  locale: 'en',
+  functions: { shout: shoutHandler },
+  messages: { en: { loud: 'He said {$word :shout}' } },
+});
+
+i18n.translate('loud', { word: 'hey' });
+// → "He said HEY"
+```
+
+Handlers extend the `messageformat` draft functions. Pass `draftFunctions: false` to leave those out.
+
+### Custom Parser
+
+`parser` replaces the MessageFormat 2 parser entirely — one call per locale, result reused:
+
+```typescript
+const i18n = createI18n({
+  locale: 'en',
+  parser: (locale) => new MyParser(locale),
+});
+```
+
 ## API
 
 ### `createI18n(config)`
@@ -215,6 +243,9 @@ Creates an i18n instance.
 | `onError`        | `(error, key) => void`, called on parse or resolution failures. Silent when omitted                                    |
 | `onMissingKey`   | `(key, locale) => string \| void`, called when a key resolves nowhere. Return a string to render it instead of the key |
 | `bidiIsolation`  | `'none'` (default) or `'default'`, which wraps placeholders in the U+2068/U+2069 characters the spec adds              |
+| `functions`      | Custom MF2 function handlers, keyed by the name a message calls them with                                              |
+| `draftFunctions` | Whether the `messageformat` draft functions are available. Defaults to `true`                                          |
+| `parser`         | `(locale) => IParser`, replacing the built-in MessageFormat 2 parser                                                   |
 
 ### Methods
 

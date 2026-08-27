@@ -475,3 +475,38 @@ test('should reject when no loader claims the extension', async () => {
 
   fetchMock.mockRestore();
 });
+
+test('should use a custom parser factory', () => {
+  const i18n = createI18n({
+    locale: 'en',
+    messages: { en: { greeting: 'Hello, {$name}!' } },
+    parser: (locale) => ({
+      parse: (message) => `[${locale}] ${message}`,
+    }),
+  });
+
+  expect(i18n.translate('greeting', { name: 'World' })).toBe(
+    '[en] Hello, {$name}!'
+  );
+});
+
+test('should build one parser per locale', () => {
+  const built: string[] = [];
+  const i18n = createI18n({
+    locale: 'en',
+    fallbackLocale: 'pt',
+    messages: { en: { a: 'A' }, pt: { b: 'B' } },
+    parser: (locale) => {
+      built.push(locale);
+
+      return { parse: (message) => message };
+    },
+  });
+
+  i18n.translate('a');
+  i18n.translate('a');
+  i18n.setLocale('pt');
+  i18n.translate('b');
+
+  expect(built).toEqual(['en', 'pt']);
+});
