@@ -683,6 +683,11 @@ export function createI18n(config: I18nConfig): I18nInstance {
 export * from './formatters/formatters.ts';
 export { getTextDirection } from './locales/direction.ts';
 export { expandLocale, resolveLocale } from './locales/resolve.ts';
+export { extractPlaceholders, validateMessages } from './messages/validate.ts';
+export type {
+  MessagesValidationIssue,
+  MessagesValidationResult,
+} from './messages/validate.ts';
 export type * from './loaders/loader.interface.ts';
 export type * from './parsers/parser.interface.ts';
 export type * from './parsers/parts.types.ts';
