@@ -480,18 +480,6 @@ export class I18nInstance {
     return undefined;
   }
 
-  private resolveMessage(
-    key: string
-  ): { message: string; locale: string } | undefined {
-    for (const locale of this.getLocaleChain()) {
-      const message = this.messagesManager.getMessage(locale, key);
-
-      if (message !== undefined) return { message, locale };
-    }
-
-    return undefined;
-  }
-
   private getParser(locale: string): MF2Parser {
     let parser = this.mf2ParserByLocale.get(locale);
     if (!parser) {
