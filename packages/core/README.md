@@ -165,6 +165,20 @@ i18n.formatRelativeTime(-2, 'days');
 await i18n.loadMessagesAsync('/locales/en.json');
 ```
 
+### Namespaces
+
+`loadMessages` deep-merges, so one locale can be assembled from several files:
+
+```typescript
+i18n.loadMessages('en', { common: { ok: 'OK' } });
+i18n.loadMessages('en', { checkout: { pay: 'Pay' } });
+
+i18n.translate('common.ok'); // → "OK"
+i18n.translate('checkout.pay'); // → "Pay"
+```
+
+Use `setMessages(locale, messages)` to replace a locale outright, and `removeMessages(locale)` to drop it.
+
 ### Custom Loader
 
 ```typescript
@@ -204,22 +218,24 @@ Creates an i18n instance.
 
 ### Methods
 
-| Method                                      | Description                 |
-| ------------------------------------------- | --------------------------- |
-| `translate(key, values?)`                   | Translate a message key     |
-| `hasMessage(key)`                           | Whether a key resolves      |
-| `formatNumber(value, options?)`             | Format a number             |
-| `formatCurrency(value, currency, options?)` | Format currency             |
-| `formatDate(value, options?)`               | Format a date               |
-| `formatList(values, options?)`              | Format a list               |
-| `formatRelativeTime(value, unit, options?)` | Format relative time        |
-| `loadMessages(locale, messages)`            | Load messages synchronously |
-| `loadMessagesAsync(url)`                    | Load messages via fetch     |
-| `setLocale(locale)`                         | Change current locale       |
-| `getLocales()`                              | Get available locales       |
-| `getLocaleChain()`                          | Get the resolution order    |
-| `getFallbackLocales()`                      | Get every fallback locale   |
-| `onLocaleChange(listener)`                  | Subscribe to locale changes |
+| Method                                      | Description                               |
+| ------------------------------------------- | ----------------------------------------- |
+| `translate(key, values?)`                   | Translate a message key                   |
+| `hasMessage(key)`                           | Whether a key resolves                    |
+| `formatNumber(value, options?)`             | Format a number                           |
+| `formatCurrency(value, currency, options?)` | Format currency                           |
+| `formatDate(value, options?)`               | Format a date                             |
+| `formatList(values, options?)`              | Format a list                             |
+| `formatRelativeTime(value, unit, options?)` | Format relative time                      |
+| `loadMessages(locale, messages)`            | Load messages synchronously, deep-merging |
+| `setMessages(locale, messages)`             | Replace every message for a locale        |
+| `removeMessages(locale)`                    | Drop a locale entirely                    |
+| `loadMessagesAsync(url)`                    | Load messages via fetch                   |
+| `setLocale(locale)`                         | Change current locale                     |
+| `getLocales()`                              | Get available locales                     |
+| `getLocaleChain()`                          | Get the resolution order                  |
+| `getFallbackLocales()`                      | Get every fallback locale                 |
+| `onLocaleChange(listener)`                  | Subscribe to locale changes               |
 
 ## License
 
