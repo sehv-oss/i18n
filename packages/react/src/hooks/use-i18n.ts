@@ -12,7 +12,7 @@ import { useI18nContext } from '../context.ts';
  * const i18n = useI18n();
  *
  * React.useEffect(() => {
- *   void i18n.loadMessagesAsync('/locales/pt-BR.json');
+ *   void i18n.loadMessagesAsync('pt-BR', '/locales/pt-BR.json');
  * }, [i18n]);
  * ```
  */

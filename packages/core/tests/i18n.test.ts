@@ -161,7 +161,7 @@ test('should load messages from a URL', async () => {
     text: async () => '{"asyncKey": "Async value"}',
   } as Response);
 
-  await i18n.loadMessagesAsync('/locales/fr.json');
+  await i18n.loadMessagesAsync('fr', '/locales/fr.json');
   i18n.setLocale('fr');
   const result = i18n.translate('asyncKey');
 
@@ -177,7 +177,9 @@ test('should throw error when response is not ok', async () => {
     statusText: 'Not Found',
   } as Response);
 
-  await expect(i18n.loadMessagesAsync('/locales/missing.json')).rejects.toThrow(
+  await expect(
+    i18n.loadMessagesAsync('en', '/locales/missing.json')
+  ).rejects.toThrow(
     'Failed to load messages from /locales/missing.json: Not Found.'
   );
 });
@@ -191,39 +193,9 @@ test('should throw error when no loader is found', async () => {
     text: async () => 'content',
   } as Response);
 
-  await expect(i18n.loadMessagesAsync('/locales/en.unknown')).rejects.toThrow(
-    'No loader found for /locales/en.unknown.'
-  );
-});
-
-test('should extract locale from URL with country code', async () => {
-  const fetchSpy = vi.spyOn(global, 'fetch');
-  const i18n = createI18n({ locale: 'en' });
-
-  fetchSpy.mockResolvedValue({
-    ok: true,
-    text: async () => '{"test": "Test"}',
-  } as Response);
-
-  await i18n.loadMessagesAsync('/locales/pt-BR.json');
-  const locales = i18n.getLocales();
-
-  expect(locales).toEqual(['pt-BR']);
-});
-
-test('should use current locale when cannot extract from URL', async () => {
-  const fetchSpy = vi.spyOn(global, 'fetch');
-  const i18n = createI18n({ locale: 'en' });
-
-  fetchSpy.mockResolvedValue({
-    ok: true,
-    text: async () => '{"test": "Test"}',
-  } as Response);
-
-  await i18n.loadMessagesAsync('/locales/123-invalid.json');
-  const locales = i18n.getLocales();
-
-  expect(locales).toEqual(['en']);
+  await expect(
+    i18n.loadMessagesAsync('en', '/locales/en.unknown')
+  ).rejects.toThrow('No loader found for /locales/en.unknown.');
 });
 
 test('should format numbers', () => {
@@ -455,4 +427,51 @@ test('should drop a locale with removeMessages', () => {
 
   expect(i18n.getLocales()).toEqual([]);
   expect(i18n.translate('a')).toBe('a');
+});
+
+test('should load messages into the locale it was given', async () => {
+  const fetchMock = vi
+    .spyOn(globalThis, 'fetch')
+    .mockResolvedValue(new Response('{"common":{"ok":"OK"}}', { status: 200 }));
+
+  const i18n = createI18n({ locale: 'en' });
+
+  await i18n.loadMessagesAsync('pt-BR', '/locales/pt-BR/common.json');
+
+  expect(i18n.getLocales()).toEqual(['pt-BR']);
+  fetchMock.mockRestore();
+});
+
+test('should merge every namespace loaded into one locale', async () => {
+  const fetchMock = vi
+    .spyOn(globalThis, 'fetch')
+    .mockResolvedValueOnce(
+      new Response('{"common":{"ok":"OK"}}', { status: 200 })
+    )
+    .mockResolvedValueOnce(
+      new Response('{"checkout":{"pay":"Pay"}}', { status: 200 })
+    );
+
+  const i18n = createI18n({ locale: 'en' });
+
+  await i18n.loadMessagesAsync('en', '/locales/en/common.json');
+  await i18n.loadMessagesAsync('en', '/locales/en/checkout.json');
+
+  expect(i18n.translate('common.ok')).toBe('OK');
+  expect(i18n.translate('checkout.pay')).toBe('Pay');
+  fetchMock.mockRestore();
+});
+
+test('should reject when no loader claims the extension', async () => {
+  const fetchMock = vi
+    .spyOn(globalThis, 'fetch')
+    .mockResolvedValue(new Response('key: value', { status: 200 }));
+
+  const i18n = createI18n({ locale: 'en' });
+
+  await expect(
+    i18n.loadMessagesAsync('en', '/locales/en.yaml')
+  ).rejects.toThrow('No loader found for /locales/en.yaml.');
+
+  fetchMock.mockRestore();
 });
