@@ -35,7 +35,10 @@ export type FormatRelativeTimeOptions = Intl.RelativeTimeFormatOptions & {
   locale?: string;
 };
 
-const cache = new FormatterCache(Intl.RelativeTimeFormat);
+const cache = new FormatterCache(
+  (locale: string, options?: Intl.RelativeTimeFormatOptions) =>
+    new Intl.RelativeTimeFormat(locale, options)
+);
 
 const unitMap: Record<FormatRelativeTimeUnit, Intl.RelativeTimeFormatUnit> = {
   year: 'year',
@@ -86,5 +89,15 @@ export class FormatRelativeTime {
     const normalizedUnit = unitMap[unit];
 
     return formatter.format(value, normalizedUnit);
+  }
+
+  /**
+   * Empties the cached `Intl` formatter instances.
+   *
+   * Rarely needed in an application; useful in a long-lived process that has finished with a set of
+   * locales, and in tests that assert on instance identity.
+   */
+  public static clearCache(): void {
+    cache.clear();
   }
 }

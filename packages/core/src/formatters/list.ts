@@ -11,7 +11,10 @@ export type FormatListOptions = Intl.ListFormatOptions & {
   locale?: string;
 };
 
-const cache = new FormatterCache(Intl.ListFormat);
+const cache = new FormatterCache(
+  (locale: string, options?: Intl.ListFormatOptions) =>
+    new Intl.ListFormat(locale, options)
+);
 
 /**
  * Standalone list formatting, for code that has a locale but no i18n instance.
@@ -40,5 +43,15 @@ export class FormatList {
     const formatter = cache.get(locale, formatOptions);
 
     return formatter.format(values);
+  }
+
+  /**
+   * Empties the cached `Intl` formatter instances.
+   *
+   * Rarely needed in an application; useful in a long-lived process that has finished with a set of
+   * locales, and in tests that assert on instance identity.
+   */
+  public static clearCache(): void {
+    cache.clear();
   }
 }

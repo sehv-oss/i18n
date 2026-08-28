@@ -6,8 +6,32 @@
  * @packageDocumentation
  */
 
+import { FormatCurrency } from './currency.ts';
+import { FormatDate } from './date.ts';
+import { FormatList } from './list.ts';
+import { FormatNumber } from './number.ts';
+import { FormatRelativeTime } from './relative-time.ts';
+
 export * from './currency.ts';
 export * from './date.ts';
 export * from './list.ts';
 export * from './number.ts';
 export * from './relative-time.ts';
+
+/**
+ * Empties every formatter cache in the package.
+ *
+ * @example
+ * ```ts
+ * import { clearFormatterCaches } from '@sehv-oss/i18n/formatters';
+ *
+ * afterEach(() => clearFormatterCaches());
+ * ```
+ */
+export function clearFormatterCaches(): void {
+  FormatCurrency.clearCache();
+  FormatDate.clearCache();
+  FormatList.clearCache();
+  FormatNumber.clearCache();
+  FormatRelativeTime.clearCache();
+}
