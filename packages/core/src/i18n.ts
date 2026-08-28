@@ -50,8 +50,7 @@ export type I18nConfig = {
   /**
    * Locale, or locales in descending preference, to read from when a key is missing in {@link I18nConfig.locale}.
    *
-   * Every tag is expanded to its parents, so `'pt-BR'` also reads from `'pt'` — and the current locale is
-   * expanded the same way, before any fallback is consulted.
+   * Every tag is expanded to its parents, so `'pt-BR'` also reads from `'pt'` — and the current locale is expanded the same way, before any fallback is consulted.
    * Only the message text comes from the fallback; it is still formatted with the current locale, so numbers and plurals follow what the reader sees.
    */
   fallbackLocale?: string | string[];
@@ -181,8 +180,7 @@ export class I18nInstance {
   }
 
   /**
-   * The locales consulted for a key, in order: the current locale and its parents, then each
-   * fallback locale and its parents. Deduplicated, so a tag appears once.
+   * The locales consulted for a key, in order: the current locale and its parents, then each fallback locale and its parents. Deduplicated, so a tag appears once.
    *
    * @example
    * ```ts
@@ -212,8 +210,8 @@ export class I18nInstance {
    * Formats the message at `key` for the current locale.
    *
    * Lookup walks dot-separated segments, except that a flat key containing literal dots wins over the nested path.
-   * Existing dictionaries keep working unchanged. The key is looked up across {@link I18nInstance.getLocaleChain}, and when it resolves
-   * in none of those locales the key itself is returned, so a missing translation shows up without being fatal.
+   * Existing dictionaries keep working unchanged. The key is looked up across {@link I18nInstance.getLocaleChain},
+   * and when it resolves in none of those locales the key itself is returned, so a missing translation shows up without being fatal.
    *
    * `values` is required exactly when the message declares placeholders, and optional otherwise.
    * That check only exists once {@link Register} has been augmented; without it, keys stay `string` and `values` stays optional.

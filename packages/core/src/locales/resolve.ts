@@ -1,8 +1,7 @@
 /**
  * Expands a BCP 47 tag into itself followed by every parent, most specific first.
  *
- * Truncations that would end on an extension singleton — the `x` of `pt-BR-x-legacy` — are skipped,
- * since they are not tags anyone would register messages under.
+ * Truncations that would end on an extension singleton — the `x` of `pt-BR-x-legacy` — are skipped, since they are not tags anyone would register messages under.
  *
  * @param locale - The tag to expand, such as `'pt-BR'`.
  * @returns The tag and every parent, most specific first.
@@ -31,8 +30,7 @@ export function expandLocale(locale: string): string[] {
 /**
  * Picks the best available locale for a request, the way `Accept-Language` negotiation does.
  *
- * Each requested tag is tried in order, and each one is expanded to its parents before moving on,
- * so `['de', 'fr-CA']` against `['en', 'fr']` resolves to `'fr'`.
+ * Each requested tag is tried in order, and each one is expanded to its parents before moving on, so `['de', 'fr-CA']` against `['en', 'fr']` resolves to `'fr'`.
  * Matching ignores case, but the returned tag is spelled the way `available` spells it.
  *
  * @param requested - One tag, or tags in descending preference — `navigator.languages` fits directly.
