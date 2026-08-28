@@ -184,3 +184,38 @@ test('should isolate placeholders when bidiIsolation is default', () => {
 
   expect(result).toBe('Hello, ⁨World⁩!');
 });
+
+test('should resolve a custom function', () => {
+  const parser = new MF2Parser('en', {
+    functions: {
+      shout: (context, _options, input) => ({
+        type: 'string',
+        source: '|shout|',
+        dir: 'ltr',
+        locale: context.locales[0] ?? 'en',
+        toString: () => String(input).toUpperCase(),
+        valueOf: () => String(input).toUpperCase(),
+      }),
+    },
+  });
+
+  expect(parser.parse('{$word :shout}', { word: 'hey' })).toBe('HEY');
+});
+
+test('should keep the draft functions available alongside custom ones', () => {
+  const parser = new MF2Parser('en', { functions: {} });
+
+  expect(parser.parse('{$n :number}', { n: 1234 })).toBe('1,234');
+});
+
+test('should drop the draft functions when asked', () => {
+  const errors: unknown[] = [];
+  const parser = new MF2Parser('en', { draftFunctions: false });
+
+  const result = parser.parse('{$d :datetime}', { d: 0 }, (error) =>
+    errors.push(error)
+  );
+
+  expect(errors.length).toBeGreaterThan(0);
+  expect(result).toContain('d');
+});
