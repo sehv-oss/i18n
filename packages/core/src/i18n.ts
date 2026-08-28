@@ -280,8 +280,7 @@ export class I18nInstance {
   /**
    * Whether `key` resolves in any locale of {@link I18nInstance.getLocaleChain}.
    *
-   * Use it to branch on a translation existing without rendering it — and without tripping
-   * {@link I18nConfig.onMissingKey}, which this never calls.
+   * Use it to branch on a translation existing without rendering it — and without tripping {@link I18nConfig.onMissingKey}, which this never calls.
    *
    * @param key - Dot path of the message.
    * @returns `true` when a message is found in the chain.
