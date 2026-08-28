@@ -39,6 +39,20 @@ import { type BidiIsolation, MF2Parser } from './parsers/mf2-parser.ts';
 export type I18nErrorHandler = (error: unknown, key: string) => void;
 
 /**
+ * Called when a key resolves in no locale of the chain.
+ *
+ * Return a string to use it as the output, which is how an empty-string or `[missing]` strategy is built.
+ * Return nothing and the key itself is rendered, as before.
+ *
+ * @param key - The key that did not resolve.
+ * @param locale - The locale that was current when the lookup ran.
+ */
+export type I18nMissingKeyHandler = (
+  key: string,
+  locale: string
+) => string | void;
+
+/**
  * Configuration accepted by {@link createI18n}.
  */
 export type I18nConfig = {
@@ -73,6 +87,21 @@ export type I18nConfig = {
   onError?: I18nErrorHandler;
 
   /**
+   * Called when a key resolves in no locale of the chain. Silent when omitted, and the key is rendered.
+   *
+   * @example
+   * ```ts
+   * createI18n({
+   *   locale: 'en',
+   *   onMissingKey: (key, locale) => {
+   *     reportToSentry(`missing ${key} in ${locale}`);
+   *   },
+   * });
+   * ```
+   */
+  onMissingKey?: I18nMissingKeyHandler;
+
+  /**
    * How placeholders with unknown directionality are isolated from the rest of the message.
    *
    * Defaults to `'none'`, which keeps the formatted output free of the U+2068/U+2069 control characters the spec default inserts.
@@ -101,6 +130,7 @@ export class I18nInstance {
   private messagesManager: MessagesManager;
   private loaders: ILoader[];
   private onError: I18nErrorHandler | undefined;
+  private onMissingKey: I18nMissingKeyHandler | undefined;
   private bidiIsolation: BidiIsolation;
   private mf2ParserByLocale: Map<string, MF2Parser>;
   private localeChangeListeners = new Set<(locale: string) => void>();
@@ -112,6 +142,7 @@ export class I18nInstance {
       loaders,
       messages,
       onError,
+      onMissingKey,
       bidiIsolation,
     } = config;
 
@@ -126,6 +157,7 @@ export class I18nInstance {
     this.mf2ParserByLocale = new Map();
     this.loaders = [new JsonLoader(), ...(loaders ?? [])];
     this.onError = onError;
+    this.onMissingKey = onMissingKey;
     this.bidiIsolation = bidiIsolation ?? 'none';
 
     if (messages) {
@@ -234,7 +266,7 @@ export class I18nInstance {
     const resolved = this.resolveMessage(key);
 
     if (!resolved) {
-      return key;
+      return this.onMissingKey?.(key, this.locale) ?? key;
     }
 
     const [params] = values as [Record<string, unknown>?];
@@ -243,6 +275,25 @@ export class I18nInstance {
     return parser.parse(resolved.message, params, (error) =>
       this.onError?.(error, key)
     );
+  }
+
+  /**
+   * Whether `key` resolves in any locale of {@link I18nInstance.getLocaleChain}.
+   *
+   * Use it to branch on a translation existing without rendering it — and without tripping {@link I18nConfig.onMissingKey}, which this never calls.
+   *
+   * @param key - Dot path of the message.
+   * @returns `true` when a message is found in the chain.
+   *
+   * @example
+   * ```ts
+   * const label = i18n.hasMessage('cart.empty')
+   *   ? i18n.translate('cart.empty')
+   *   : '';
+   * ```
+   */
+  public hasMessage(key: TranslationKey): boolean {
+    return this.resolveMessage(key) !== undefined;
   }
 
   /**
