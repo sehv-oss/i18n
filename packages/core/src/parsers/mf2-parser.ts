@@ -2,15 +2,18 @@ import { MessageFormat } from 'messageformat';
 import { DraftFunctions, type MessageFunction } from 'messageformat/functions';
 
 import { BoundedCache } from '../caches/bounded.ts';
+import { getTextDirection } from '../locales/direction.ts';
 import type { IParser, ParseErrorHandler } from './parser.interface.ts';
 
 /**
  * How placeholders with unknown directionality are isolated from the rest of the message.
  *
+ * - `'auto'` — the default: `'none'` for left-to-right locales, `'default'` for right-to-left ones.
+ *   Left-to-right output stays free of control characters, and mixed-direction text still renders correctly.
  * - `'none'` — no isolation, the output carries only visible characters.
  * - `'default'` — the spec behavior, wrapping placeholders in the U+2068 and U+2069 control characters so mixed-direction text renders correctly.
  */
-export type BidiIsolation = 'default' | 'none';
+export type BidiIsolation = 'auto' | 'default' | 'none';
 
 /**
  * Custom MF2 function handlers, keyed by the name a message calls them with — `{$x :shout}` looks up `shout`.
@@ -27,7 +30,7 @@ type CompiledMessage = MessageFormat<string, string>;
 export type MF2ParserOptions = {
   /**
    * How placeholders with unknown directionality are isolated from the rest of the message.
-   * Defaults to `'none'`, which keeps the formatted output free of the U+2068/U+2069 control characters the spec default inserts.
+   * Defaults to `'auto'`, which isolates only in right-to-left locales.
    */
   bidiIsolation?: BidiIsolation;
 
@@ -51,13 +54,16 @@ export type MF2ParserOptions = {
  */
 export class MF2Parser implements IParser {
   private locale: string;
-  private bidiIsolation: BidiIsolation;
+  private bidiIsolation: 'default' | 'none';
   private functions: I18nFunctions;
   private compiled = new BoundedCache<CompiledMessage>();
 
   constructor(locale: string, options?: MF2ParserOptions) {
     this.locale = locale;
-    this.bidiIsolation = options?.bidiIsolation ?? 'none';
+    this.bidiIsolation = resolveBidiIsolation(
+      options?.bidiIsolation ?? 'auto',
+      locale
+    );
     this.functions = {
       ...(options?.draftFunctions === false
         ? {}
@@ -105,6 +111,15 @@ export class MF2Parser implements IParser {
       return undefined;
     }
   }
+}
+
+function resolveBidiIsolation(
+  isolation: BidiIsolation,
+  locale: string
+): 'default' | 'none' {
+  if (isolation !== 'auto') return isolation;
+
+  return getTextDirection(locale) === 'rtl' ? 'default' : 'none';
 }
 
 function silent(): void {}

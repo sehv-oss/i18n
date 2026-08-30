@@ -109,7 +109,8 @@ export type I18nConfig = {
   /**
    * How placeholders with unknown directionality are isolated from the rest of the message.
    *
-   * Defaults to `'none'`, which keeps the formatted output free of the U+2068/U+2069 control characters the spec default inserts.
+   * Defaults to `'auto'`: no isolation for left-to-right locales, and the spec's U+2068/U+2069 isolates
+   * for right-to-left ones. Pass `'none'` or `'default'` to force one everywhere.
    */
   bidiIsolation?: BidiIsolation;
 
@@ -191,7 +192,7 @@ export class I18nInstance {
     this.loaders = [new JsonLoader(), ...(loaders ?? [])];
     this.onError = onError;
     this.onMissingKey = onMissingKey;
-    this.bidiIsolation = bidiIsolation ?? 'none';
+    this.bidiIsolation = bidiIsolation ?? 'auto';
     this.parserFactory =
       parser ??
       ((parserLocale) =>
@@ -574,6 +575,7 @@ export function createI18n(config: I18nConfig): I18nInstance {
 }
 
 export * from './formatters/formatters.ts';
+export { getTextDirection } from './locales/direction.ts';
 export { expandLocale, resolveLocale } from './locales/resolve.ts';
 export type * from './loaders/loader.interface.ts';
 export type * from './parsers/parser.interface.ts';
