@@ -1,5 +1,5 @@
 ---
-"@sehv-oss/i18n": patch
+"@sehv-oss/i18n": major
 ---
 
 feat(core)!: default bidiIsolation to auto
