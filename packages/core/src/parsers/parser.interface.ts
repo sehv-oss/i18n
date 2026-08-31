@@ -1,3 +1,5 @@
+import type { I18nPart } from './parts.types.ts';
+
 /**
  * Called when a message fails to compile or format, with the underlying error.
  *
@@ -21,6 +23,22 @@ export interface IParser {
     values?: Record<string, unknown>,
     onError?: ParseErrorHandler
   ): string;
+
+  /**
+   * Formats one message into text and markup parts.
+   *
+   * Optional: a parser that does not implement it can still back `translate`, and `translateToParts`
+   * then degrades to a single text part carrying the fully formatted string.
+   *
+   * @param message - The message source text.
+   * @param values - Placeholder values the message reads.
+   * @param onError - Notified on failure, the same way {@link IParser.parse} notifies.
+   */
+  parseToParts?(
+    message: string,
+    values?: Record<string, unknown>,
+    onError?: ParseErrorHandler
+  ): I18nPart[];
 }
 
 /**

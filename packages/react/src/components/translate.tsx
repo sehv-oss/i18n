@@ -1,4 +1,9 @@
 import type { TranslateArgs, TranslationKey } from '@sehv-oss/i18n';
+
+import {
+  useRichTranslate,
+  type RichTags,
+} from '../hooks/use-rich-translate.tsx';
 import { useTranslate } from '../hooks/use-translate.ts';
 
 /**
@@ -18,6 +23,14 @@ export type TranslateProps<TKey extends TranslationKey = TranslationKey> = {
    * Dot path of the message to render.
    */
   id: TKey;
+
+  /**
+   * Renderers for the message's markup placeholders, keyed by name.
+   *
+   * Omit it and the component renders a plain string, as it always has. Pass it and
+   * `{#link}…{/link}` becomes whatever `tags.link` returns.
+   */
+  tags?: RichTags;
 } & ValuesProp<TKey>;
 
 /**
@@ -35,12 +48,18 @@ export type TranslateProps<TKey extends TranslationKey = TranslationKey> = {
 export function Translate<TKey extends TranslationKey>(
   props: TranslateProps<TKey>
 ) {
-  const { id, values } = props as {
+  const { id, values, tags } = props as {
     id: TKey;
     values?: Record<string, unknown>;
+    tags?: RichTags;
   };
 
   const translate = useTranslate();
+  const richTranslate = useRichTranslate();
+
+  if (tags) {
+    return richTranslate(id, values as TranslateArgs<TKey>[0], tags);
+  }
 
   return translate(id, ...([values] as TranslateArgs<TKey>));
 }

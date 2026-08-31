@@ -97,6 +97,32 @@ function MyComponent() {
 }
 ```
 
+### Rich text
+
+A message can carry markup placeholders, and `tags` turns them into elements:
+
+```tsx
+// en.ts → { terms: 'Accept the {#link}terms{/link}' }
+
+<Translate
+  id="terms"
+  tags={{ link: (chunks) => <a href="/terms">{chunks}</a> }}
+/>
+// → Accept the <a href="/terms">terms</a>
+```
+
+`useRichTranslate` is the hook form:
+
+```tsx
+const richTranslate = useRichTranslate();
+
+richTranslate('terms', undefined, {
+  link: (chunks) => <a href="/terms">{chunks}</a>,
+});
+```
+
+A placeholder with no matching entry in `tags` still renders its text, so a missing renderer degrades instead of dropping content.
+
 ### Type-safe keys
 
 Augment `Register` once — in the core package — and the hooks and components pick it up on their own. There is no generic to thread, no factory to call and nothing extra to pass to the provider:
@@ -140,6 +166,7 @@ See the [core README](../core/README.md#type-safe-keys) for how the message shap
 | `useI18n()`               | i18n instance                               |
 | `useLocale()`             | `[locale, setLocale]`                       |
 | `useTranslate()`          | `translate(key, values?)`                   |
+| `useRichTranslate()`      | `richTranslate(key, values?, tags?)`        |
 | `useFormatNumber()`       | `formatNumber(value, options?)`             |
 | `useFormatCurrency()`     | `formatCurrency(value, currency, options?)` |
 | `useFormatDate()`         | `formatDate(value, options?)`               |
@@ -150,7 +177,7 @@ See the [core README](../core/README.md#type-safe-keys) for how the message shap
 
 | Component            | Props                             |
 | -------------------- | --------------------------------- |
-| `Translate`          | `id`, `values?`                   |
+| `Translate`          | `id`, `values?`, `tags?`          |
 | `FormatNumber`       | `value`, `...options`             |
 | `FormatCurrency`     | `value`, `currency`, `...options` |
 | `FormatDate`         | `value`, `...options`             |

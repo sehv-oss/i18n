@@ -2,7 +2,7 @@ import { expect, test } from 'vitest';
 import { render } from 'vitest-browser-react';
 import { createI18n } from '@sehv-oss/i18n';
 
-import { Translate } from '../../src/components/translate.ts';
+import { Translate } from '../../src/components/translate.tsx';
 import { I18nProvider } from '../../src/provider.tsx';
 
 test('should render translated text', async () => {
@@ -55,4 +55,24 @@ test('should render key when translation not found', async () => {
   const textElement = screen.getByText('nonexistent.key');
 
   expect(textElement).toBeInTheDocument();
+});
+
+test('should render markup through the tags prop', async () => {
+  const i18n = createI18n({
+    locale: 'en',
+    messages: { en: { terms: 'Accept the {#link}terms{/link}' } },
+  });
+
+  const screen = await render(
+    <I18nProvider i18n={i18n}>
+      <p>
+        <Translate
+          id="terms"
+          tags={{ link: (chunks) => <a href="/terms">{chunks}</a> }}
+        />
+      </p>
+    </I18nProvider>
+  );
+
+  await expect.element(screen.getByRole('link')).toHaveTextContent('terms');
 });

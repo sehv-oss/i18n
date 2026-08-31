@@ -23,6 +23,7 @@ import { JsonLoader } from './loaders/json-loader.ts';
 import { expandLocale } from './locales/resolve.ts';
 import type { ILoader } from './loaders/loader.interface.ts';
 import type { IParser, IParserFactory } from './parsers/parser.interface.ts';
+import type { I18nPart } from './parsers/parts.types.ts';
 import type { TranslationKey } from './messages/keys.types.ts';
 import { type Messages, MessagesManager } from './messages/messages.ts';
 import type { TranslateArgs } from './messages/values.types.ts';
@@ -320,6 +321,56 @@ export class I18nInstance {
   }
 
   /**
+   * Formats the message at `key` into text and markup parts, instead of one flat string.
+   *
+   * This is what makes a message like `Accept the {#link}terms{/link}` renderable without splitting it
+   * into three separate keys. `@sehv-oss/i18n-react` builds on it in `useRichTranslate` and in the
+   * `tags` prop of `<Translate>`; outside React, pair `'open'` and `'close'` parts by `name` yourself.
+   *
+   * Falls back to a single text part when the configured parser does not implement `parseToParts`.
+   *
+   * @param key - Dot path of the message.
+   * @param values - Placeholder values the message reads.
+   * @returns The message as a flat stream of text and markup parts.
+   *
+   * @example
+   * ```ts
+   * i18n.translateToParts('terms');
+   * // [{ type: 'text', value: 'Accept the ' },
+   * //  { type: 'markup', kind: 'open', name: 'link' },
+   * //  { type: 'text', value: 'terms' },
+   * //  { type: 'markup', kind: 'close', name: 'link' }]
+   * ```
+   */
+  public translateToParts<TKey extends TranslationKey>(
+    key: TKey,
+    ...values: TranslateArgs<TKey>
+  ): I18nPart[] {
+    const resolved = this.resolveMessage(key);
+
+    if (!resolved) {
+      return [
+        { type: 'text', value: this.onMissingKey?.(key, this.locale) ?? key },
+      ];
+    }
+
+    const [params] = values as [Record<string, unknown>?];
+    const parser = this.getParser(this.locale);
+    const onError = (error: unknown) => this.onError?.(error, key);
+
+    if (!parser.parseToParts) {
+      return [
+        {
+          type: 'text',
+          value: parser.parse(resolved.message, params, onError),
+        },
+      ];
+    }
+
+    return parser.parseToParts(resolved.message, params, onError);
+  }
+
+  /**
    * Whether `key` resolves in any locale of {@link I18nInstance.getLocaleChain}.
    *
    * Use it to branch on a translation existing without rendering it — and without tripping {@link I18nConfig.onMissingKey}, which this never calls.
@@ -579,6 +630,7 @@ export { getTextDirection } from './locales/direction.ts';
 export { expandLocale, resolveLocale } from './locales/resolve.ts';
 export type * from './loaders/loader.interface.ts';
 export type * from './parsers/parser.interface.ts';
+export type * from './parsers/parts.types.ts';
 export type { Messages } from './messages/messages.ts';
 export type { Register } from './messages/register.types.ts';
 export type { MessageKey, TranslationKey } from './messages/keys.types.ts';
