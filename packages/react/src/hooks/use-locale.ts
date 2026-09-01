@@ -27,7 +27,7 @@ export type UseLocaleReturn = [string, (locale: string) => void];
  * ```
  */
 export function useLocale(): UseLocaleReturn {
-  const { i18n } = useI18nContext();
+  const { i18n, locale } = useI18nContext();
 
   const setLocale = React.useCallback(
     (newLocale: string) => {
@@ -35,8 +35,6 @@ export function useLocale(): UseLocaleReturn {
     },
     [i18n]
   );
-
-  const locale = i18n.getLocale();
 
   return [locale, setLocale];
 }
