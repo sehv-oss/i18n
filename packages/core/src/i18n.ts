@@ -12,6 +12,15 @@ import {
   type FormatCurrencyOptions,
 } from './formatters/currency.ts';
 import { FormatDate, type FormatDateOptions } from './formatters/date.ts';
+import {
+  FormatDisplayName,
+  type FormatDisplayNameOptions,
+} from './formatters/display-name.ts';
+import {
+  FormatDuration,
+  type FormatDurationInput,
+  type FormatDurationOptions,
+} from './formatters/duration.ts';
 import { FormatList, type FormatListOptions } from './formatters/list.ts';
 import { FormatNumber, type FormatNumberOptions } from './formatters/number.ts';
 import {
@@ -482,6 +491,49 @@ export class I18nInstance {
     const locale = options?.locale ?? this.locale;
 
     return FormatRelativeTime.format(value, unit, locale, options);
+  }
+
+  /**
+   * Names a language, region, script or currency in the current locale, with `Intl.DisplayNames`.
+   *
+   * This is what a language switcher renders — the name of each locale, written the way the current
+   * reader would write it.
+   *
+   * @param value - The code to name, matching `options.type`.
+   * @param options - `Intl.DisplayNamesOptions` — `type` is required — plus a `locale` that overrides the current one.
+   *
+   * @example
+   * ```ts
+   * i18n.formatDisplayName('en-US', { type: 'language' }); // "English (United States)"
+   * ```
+   */
+  public formatDisplayName(
+    value: string,
+    options: FormatDisplayNameOptions
+  ): string {
+    const locale = options.locale ?? this.locale;
+
+    return FormatDisplayName.format(value, locale, options);
+  }
+
+  /**
+   * Formats a duration with `Intl.DurationFormat`.
+   *
+   * @param value - The duration, as units to values.
+   * @param options - `Intl.DurationFormatOptions`, plus a `locale` that overrides the current one for this call.
+   *
+   * @example
+   * ```ts
+   * i18n.formatDuration({ hours: 1, minutes: 30 }); // "1 hr, 30 min"
+   * ```
+   */
+  public formatDuration(
+    value: FormatDurationInput,
+    options?: FormatDurationOptions
+  ): string {
+    const locale = options?.locale ?? this.locale;
+
+    return FormatDuration.format(value, locale, options);
   }
 
   /**

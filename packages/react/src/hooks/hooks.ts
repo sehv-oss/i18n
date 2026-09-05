@@ -8,6 +8,8 @@
 
 export * from './use-format-currency.ts';
 export * from './use-format-date.ts';
+export * from './use-format-display-name.ts';
+export * from './use-format-duration.ts';
 export * from './use-format-list.ts';
 export * from './use-format-number.ts';
 export * from './use-format-relative-time.ts';

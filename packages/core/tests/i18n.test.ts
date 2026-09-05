@@ -510,3 +510,19 @@ test('should build one parser per locale', () => {
 
   expect(built).toEqual(['en', 'pt']);
 });
+
+test('should name a language in the current locale', () => {
+  const i18n = createI18n({ locale: 'pt-BR' });
+
+  expect(i18n.formatDisplayName('en-US', { type: 'language' })).toBe(
+    'inglês (Estados Unidos)'
+  );
+});
+
+test('should format a duration in the current locale', () => {
+  const i18n = createI18n({ locale: 'pt-BR' });
+
+  expect(
+    i18n.formatDuration({ hours: 1, minutes: 30 }, { style: 'long' })
+  ).toBe('1 hora e 30 minutos');
+});
