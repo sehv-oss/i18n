@@ -32,13 +32,13 @@ declare module '@sehv-oss/i18n' {
 - A `.match` selector must be annotated by a preceding `.input` or `.local` declaration. Rewrite `.match {$count :number}` as `.input {$count :number}` followed by `.match $count`; `.match $count` on its own is rejected.
 - `values` becomes a required argument when the message declares placeholders. This only applies once `Register` is augmented.
 - `messageformat` is now a dependency. It has no dependencies of its own, so nothing transitive is added.
-- `engines.node` is now `^22.12 || >=24 <27`, matching `messageformat`.
+- `engines.node` is now `>=24 <27`.
 - Formatted output no longer goes through a result cache; compiled messages are cached instead. Values that are not JSON-serializable, such as `Date`, are no longer mis-keyed.
 
 **New options**
 
 - `onError: (error, key) => void` reports parse and resolution failures. Silent when omitted, as before.
-- `bidiIsolation` defaults to `'none'`, keeping output free of the U+2068/U+2069 control characters the spec inserts around placeholders. Pass `'default'` for the spec behavior.
+- `bidiIsolation` controls the U+2068/U+2069 control characters the spec inserts around placeholders. It defaults to `'auto'`, which isolates only in right-to-left locales; pass `'none'` or `'default'` to force one everywhere.
 
 # @sehv-oss/i18n-react
 

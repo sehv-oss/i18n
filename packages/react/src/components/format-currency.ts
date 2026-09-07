@@ -1,5 +1,5 @@
 import type { FormatCurrencyOptions } from '@sehv-oss/i18n';
-import { useFormatCurrency } from '../hooks/use-format-currency';
+import { useFormatCurrency } from '../hooks/use-format-currency.ts';
 
 /**
  * Props for {@link FormatCurrency}: the value and currency, plus the `Intl.NumberFormat` options — minus `style` — spread as their own props.

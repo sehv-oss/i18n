@@ -298,6 +298,7 @@ Creates an i18n instance.
 | Method                                      | Description                                 |
 | ------------------------------------------- | ------------------------------------------- |
 | `translate(key, values?)`                   | Translate a message key                     |
+| `translateToParts(key, values?)`            | Translate into text and markup parts        |
 | `hasMessage(key)`                           | Whether a key resolves                      |
 | `formatNumber(value, options?)`             | Format a number                             |
 | `formatCurrency(value, currency, options?)` | Format currency                             |
@@ -313,6 +314,7 @@ Creates an i18n instance.
 | `setLocale(locale)`                         | Change current locale                       |
 | `getLocales()`                              | Get available locales                       |
 | `getLocaleChain()`                          | Get the resolution order                    |
+| `getFallbackLocale()`                       | Get the first fallback locale               |
 | `getFallbackLocales()`                      | Get every fallback locale                   |
 | `onLocaleChange(listener)`                  | Subscribe to locale changes                 |
 

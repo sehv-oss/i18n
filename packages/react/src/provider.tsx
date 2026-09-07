@@ -1,6 +1,6 @@
 import * as React from 'react';
 import type { I18nInstance } from '@sehv-oss/i18n';
-import { I18nContext, type I18nContextValue } from './context';
+import { I18nContext, type I18nContextValue } from './context.ts';
 
 /**
  * Props for {@link I18nProvider}.
