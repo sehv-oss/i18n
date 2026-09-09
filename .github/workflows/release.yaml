@@ -13,5 +13,5 @@ permissions:
 
 jobs:
   release:
-    uses: sehv-oss/actions/.github/workflows/release-node-pnpm.yaml@main
+    uses: sehv-oss/actions/.github/workflows/release-node-pnpm.yaml@v1
     secrets: inherit
