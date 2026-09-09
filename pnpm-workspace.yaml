@@ -9,28 +9,28 @@ allowBuilds:
 engineStrict: true
 
 catalog:
-  '@changesets/cli': 3.0.0
+  '@changesets/cli': 3.0.2
   '@tailwindcss/vite': 4.3.3
-  '@types/node': 26.2.0
+  '@types/node': 26.5.0
   '@types/react': ^19.0.0
   '@types/react-dom': ^19.0.0
-  '@vitejs/plugin-react': 6.0.5
-  '@vitest/browser-playwright': 4.1.10
-  '@vitest/coverage-v8': 4.1.10
-  autoprefixer: 10.5.4
-  cspell: 10.0.1
-  eslint: 10.8.1
+  '@vitejs/plugin-react': 6.1.1
+  '@vitest/browser-playwright': 5.0.0
+  '@vitest/coverage-v8': 5.0.0
+  autoprefixer: 10.5.5
+  cspell: 10.2.2
+  eslint: 10.10.0
   messageformat: 4.0.0
-  playwright: 1.62.1
-  postcss: 8.5.26
+  playwright: 1.63.0
+  postcss: 8.5.28
   prettier: 3.9.6
   react: ^19.0.0
   react-dom: ^19.0.0
   shiki: 4.4.3
   tailwindcss: 4.3.3
-  tsdown: 0.22.14
+  tsdown: 0.23.0
   typescript: 7.0.2
   vite: 8.2.1
-  vitest: 4.1.10
-  vitest-browser-react: 2.2.0
+  vitest: 5.0.0
+  vitest-browser-react: 2.3.0
   yaml: 2.9.0

@@ -9,5 +9,5 @@ concurrency:
 
 jobs:
   pull-request:
-    uses: sehv-oss/actions/.github/workflows/pull-request-node-pnpm.yaml@main
+    uses: sehv-oss/actions/.github/workflows/pull-request-node-pnpm.yaml@v1
     secrets: inherit
