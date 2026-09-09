@@ -1,6 +1,6 @@
 # @sehv-oss/i18n-react
 
-## 2.0.0
+## 2.1.0
 
 ### Major Changes
 
@@ -93,7 +93,7 @@
 - Updated dependencies [e52191b]
 - Updated dependencies [b2fe64b]
 - Updated dependencies [564ed26]
-  - @sehv-oss/i18n@2.0.0
+  - @sehv-oss/i18n@2.1.0
 
 ## 1.0.3
 
